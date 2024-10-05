@@ -6,6 +6,11 @@ def getExoplanetData():
     planets = []
     for system in oec.findall(".//system"):
         systemDist = system.findtext("distance"),
+        try:
+            if type(systemDist[0]) == None or float(systemDist[0]) > 600:
+                continue
+        except:
+            continue
         systemRightAscension = system.findtext("rightascension"), 
         systemDeclination = system.findtext("declination")
         for planet in system.findall(".//planet"):
@@ -23,3 +28,5 @@ def getExoplanetData():
 database = getExoplanetData()
 for planet in database:
     print(planet)
+
+print(len(database))
