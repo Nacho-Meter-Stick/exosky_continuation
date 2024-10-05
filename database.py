@@ -14,7 +14,8 @@ def getExoplanetData():
                 inclination = planet.findtext("inclination"),
                 distance = systemDist,
                 rightascension = systemRightAscension,
-                declination = systemDeclination
+                declination = systemDeclination,
+                description = planet.findtext("description")
             )
             planets.append(planetdict)
     return planets
