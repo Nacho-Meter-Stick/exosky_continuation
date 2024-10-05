@@ -1,15 +1,24 @@
 import xml.etree.ElementTree as ET, urllib.request, gzip, io
 url = "https://github.com/OpenExoplanetCatalogue/oec_gzip/raw/master/systems.xml.gz"
 oec = ET.parse(gzip.GzipFile(fileobj=io.BytesIO(urllib.request.urlopen(url).read())))
- 
-# Output mass and radius of all planets 
-for planet in oec.findall(".//planet"):
-    print([planet.findtext("mass"), planet.findtext("radius")])
- 
-# Find all circumbinary planets 
-for planet in oec.findall(".//binary/planet"):
-    print(planet.findtext("name"))
- 
-# Output distance to planetary system (in pc, if known) and number of planets in system
-for system in oec.findall(".//system"):
-    print(system.findtext("distance"), len(system.findall(".//planet"))) 
+
+def getExoplanetData():
+    planets = []
+    for system in oec.findall(".//system"):
+        systemDist = system.findtext("distance"),
+        systemRightAscension = system.findtext("rightascension"), 
+        systemDeclination = system.findtext("declination")
+        for planet in system.findall(".//planet"):
+            planetdict = dict(
+                name = planet.findtext("name"), 
+                inclination = planet.findtext("inclination"),
+                distance = systemDist,
+                rightascension = systemRightAscension,
+                declination = systemDeclination
+            )
+            planets.append(planetdict)
+    return planets
+
+database = getExoplanetData()
+for planet in database:
+    print(planet)
