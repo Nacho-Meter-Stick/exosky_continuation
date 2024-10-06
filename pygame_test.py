@@ -89,7 +89,8 @@ while True:
 
     planet_text = planet_font.render(planet_str, False, '#F39237')
     constellation_text = planet_font.render(constellation_str, False, '#2C2A4A')
-    for event in pygame.event.get():
+    event_list = pygame.event.get()
+    for event in event_list:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if(mapping):
                 if(pos[0] != -1):
