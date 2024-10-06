@@ -37,6 +37,9 @@ def normalized(vector_rectangular: tuple[float,...]) -> float:
 def quaternion(rotation_angle: float, 
                vector_rectangular: tuple[float, float, float] = None, 
                vector_polar: tuple[float, float, float] = None) -> tuple[float, float, float, float]:
+    '''
+    all angles must be radians
+    '''
     if vector_polar is None:
         x, y, z = normalized(vector_rectangular)
     if vector_rectangular is None:
