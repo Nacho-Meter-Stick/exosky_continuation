@@ -4,11 +4,10 @@ from astropy.coordinates import spherical_to_cartesian
 import numpy as np
 import numpy.typing as npt
 import matplotlib.pyplot as plt
-import star_mag
+from star_mag import delta_star_magnitude
 
 import xml.etree.ElementTree as ET, urllib.request, gzip, io
 
-from star_mag import delta_star_magnitude
 url = "https://github.com/OpenExoplanetCatalogue/oec_gzip/raw/master/systems.xml.gz"
 oec = ET.parse(gzip.GzipFile(fileobj=io.BytesIO(urllib.request.urlopen(url).read())))
 
