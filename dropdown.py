@@ -2,11 +2,11 @@ import pygame
 import database
 import time
 
-COLOR_INACTIVE = (79, 81, 140)
-COLOR_ACTIVE = (144, 122, 214)
-COLOR_TEXT = (243, 146, 55)
-COLOR_LIST_INACTIVE = (79, 81, 140)
-COLOR_LIST_ACTIVE = (144, 122, 214)
+COLOR_INACTIVE = (22, 21, 37)
+COLOR_ACTIVE = (44, 42, 74)
+COLOR_TEXT = (238, 227, 206)
+COLOR_LIST_INACTIVE = (22, 21, 37)
+COLOR_LIST_ACTIVE = (44, 42, 74)
 
 pygame.init()
 FONT = pygame.font.Font('./programFonts/font.ttf', 100)
@@ -33,18 +33,20 @@ class SearchableDropDown():
         pygame.draw.rect(surf, self.menu_color[self.menu_active], self.rect, 0)
         surf.blit(self.text_surf, (self.rect.x+5, self.rect.y+5))
 
+        # copy the box down for all options shown
         if self.draw_dropdown:
             for i, text in enumerate(self.shownOptions):
                 rect = self.rect.copy()
                 rect.y += (i+1) * self.rect.height
                 pygame.draw.rect(surf, self.option_color[1 if i == self.active_option else 0], rect, 0)
-                text = self.font.render(text, 1, (0, 0, 0))
+                text = self.font.render(text, 1, self.txt_color)
                 surf.blit(text, text.get_rect(center = rect.center))
 
     def update(self, event_list):
         mpos = pygame.mouse.get_pos()
         self.menu_active = self.rect.collidepoint(mpos)
 
+        # Draw the dropdown 
         for i in range(len(self.shownOptions)):
             rect = self.rect.copy()
             rect.y += (i+1) * self.rect.height
@@ -55,6 +57,7 @@ class SearchableDropDown():
         if not self.menu_active and self.active_option == -1:
             self.draw_dropdown = False
 
+        # event handler
         for event in event_list:
             if event.type == pygame.KEYDOWN:
                 if not self.menu_active:
@@ -209,7 +212,8 @@ if __name__ == "__main__":
             exoPlanetSelector.chosen = exoPlanetSelector.options[selected_option]
 
         #screen.blit(dropDownSurf, (0, 0), area=pygame.rect(50, 50, 200, 400))
-        screen.fill((22, 21, 37))
+        screen.fill((238, 227, 206
+        ))
         exoPlanetSelector.draw(screen)
         pygame.display.update()
         #time.sleep(10)
