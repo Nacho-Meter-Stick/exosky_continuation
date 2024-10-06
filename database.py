@@ -34,7 +34,7 @@ def getExoplanetData():
             planets.append(planetdict)
     return planets
 
-def getStarDataSpherical() -> npt.NDArray:
+def buildSphericalDatabase() -> npt.NDArray:
     starslist: list[tuple] = []
     with open("HIP database.csv", mode="r") as HIP_database:
         csvFile = csv.DictReader(HIP_database)
@@ -71,5 +71,5 @@ def buildCartesianDatabase(spherical_database: npt.NDArray) -> npt.NDArray:
     return star_database
 
 planet_database = getExoplanetData()
-star_database_spherical = getStarDataSpherical()
+star_database_spherical = buildSphericalDatabase()
 star_database = buildCartesianDatabase(star_database_spherical)
