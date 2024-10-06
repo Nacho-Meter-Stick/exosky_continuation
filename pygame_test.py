@@ -39,15 +39,15 @@ def generateSkySurface(width, height):
 
 white = (255, 255, 255)
 pygame.init()
-start_font = pygame.font.Font('./programFonts/font.ttf', 100)
-planet_font = pygame.font.Font('./programFonts/font.ttf', 50)
-title_text = start_font.render('Exosky Challenge!', False, '#907AD6')
+start_font = pygame.font.Font('./programFonts/Cascadia.ttf', 90)
+planet_font = pygame.font.Font('./programFonts/Cascadia.ttf', 40)
+title_text = start_font.render('Exosky Explorer!', False, '#907AD6')
 start_text = start_font.render('Start', False, '#EEE3CE')
-switch_text = planet_font.render('Switch Planets', False, '#907AD6')
-exit_text = planet_font.render('Exit', False, '#907AD6')
-save_text = planet_font.render('Save', False, '#907AD6')
-
+switch_text = planet_font.render('Switch Planets', False, '#2C2A4A')
+exit_text = planet_font.render('Exit', False, '#2C2A4A')
+save_text = planet_font.render('Save', False, '#2C2A4A')
 pygame.display.set_caption('Exosky!')
+
 window_surface = pygame.display.set_mode((0, 0), pygame.FULLSCREEN) #or pygame.FULLSCREEN to have the window stay fullscreen (no bar at top) Two numbers indicate minimized size
 size = pygame.display.get_window_size()
 background = pygame.Surface((size[0], size[1]))
@@ -68,30 +68,32 @@ while True:
     window_surface.blit(sky_surface, (0,0))
 
     planet_text = planet_font.render(planet_str, False, '#F39237')
-    constellation_text = planet_font.render(constellation_str, False, '#907AD6')
+    constellation_text = planet_font.render(constellation_str, False, '#2C2A4A')
     for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONDOWN:
             if(mapping):
                 if(pos[0] != -1):
                     arr.append(pos[0]);arr.append(pos[1]);arr.append(pygame.mouse.get_pos()[0]);arr.append(pygame.mouse.get_pos()[1])
             pos = pygame.mouse.get_pos()
+    text_rect = title_text.get_rect(center=(size[0]/2, 50))
+    window_surface.blit(title_text, text_rect)
     if not(start):
-        start_button = pygame.draw.rect(window_surface,'#F39237', pygame.Rect(810, 710, 280, 95),  0, 3)
-        window_surface.blit(title_text, (525, 450))
-        window_surface.blit(start_text, (825, 705))
+        start_button = pygame.draw.rect(window_surface,'#F39237', pygame.Rect(820, 1000, 280, 90),  0, 3)
+        text_rect = start_text.get_rect(center=(size[0]/2, 1045))
+        window_surface.blit(start_text, text_rect)
         if start_button.collidepoint(pos):
             start = True
     else:
         if not(saving):
-            text_rect = planet_text.get_rect(center=(1920/2, 40))
+            text_rect = planet_text.get_rect(center=(size[0]/2, 120))
             window_surface.blit(planet_text, text_rect)
-            switch_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(1435, 15, 390, 70), 0, 3) 
+            switch_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(1435, 15, 355, 60), 0, 3) 
             window_surface.blit(switch_text, (1450, 20))
-            constellation_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(70, 15, 370, 70), 0, 3)
+            constellation_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(70, 15, 345, 60), 0, 3)
             window_surface.blit(constellation_text, (85, 20))
-            exit_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(90, 1115, 130, 70), 0, 3)
+            exit_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(90, 1115, 110, 60), 0, 3)
             window_surface.blit(exit_text, (100, 1120))
-            save_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(1710, 1115, 120, 70), 0, 3)
+            save_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(1710, 1115, 115, 60), 0, 3)
             window_surface.blit(save_text, (1720, 1120))
         if switch_button.collidepoint(pos):
             print("planet switch!!")
