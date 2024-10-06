@@ -178,7 +178,7 @@ class UserInputBox():
         self.rect.w = width
 
     def draw(self, surf):
-        pygame.draw.rect(surf, self.color, self.rect, 0)
+        pygame.draw.rect(surf, self.color, self.rect, 0, border_radius=3)
         screen.blit(self.text_surf, (self.rect.x+5, self.rect.y+5))
         
 
@@ -200,8 +200,7 @@ if __name__ == "__main__":
             exoPlanetSelector.chosen = exoPlanetSelector.options[selected_option]
 
         #screen.blit(dropDownSurf, (0, 0), area=pygame.rect(50, 50, 200, 400))
-        screen.fill((238, 227, 206
-        ))
+        screen.fill((238, 227, 206))
         exoPlanetSelector.draw(screen)
         pygame.display.update()
         #time.sleep(10)
