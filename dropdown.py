@@ -33,6 +33,7 @@ class SearchableDropDown():
         pygame.draw.rect(surf, self.menu_color[self.menu_active], self.rect, 0)
         surf.blit(self.text_surf, (self.rect.x+5, self.rect.y+5))
 
+        # copy the box down for all options shown
         if self.draw_dropdown:
             for i, text in enumerate(self.shownOptions):
                 rect = self.rect.copy()
@@ -45,6 +46,7 @@ class SearchableDropDown():
         mpos = pygame.mouse.get_pos()
         self.menu_active = self.rect.collidepoint(mpos)
 
+        # Draw the dropdown 
         for i in range(len(self.shownOptions)):
             rect = self.rect.copy()
             rect.y += (i+1) * self.rect.height
@@ -55,6 +57,7 @@ class SearchableDropDown():
         if not self.menu_active and self.active_option == -1:
             self.draw_dropdown = False
 
+        # event handler
         for event in event_list:
             if event.type == pygame.KEYDOWN:
                 if not self.menu_active:
