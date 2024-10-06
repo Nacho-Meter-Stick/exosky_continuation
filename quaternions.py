@@ -50,6 +50,6 @@ def quaternion(rotation_angle: float,
     c, s = cos(rotation_angle/2), sin(rotation_angle/2)
     return (c, s*x, s*y, s*z)
 
-def star_map_from_exo_persp_ROTATION(star_map, longitude_of_ascending_node, inclination, argument_of_periapsis):
+def apply_exo_rotation_to_starmap(star_map, longitude_of_ascending_node, inclination, argument_of_periapsis):
     rotation = R.from_euler('zxz', np.array([-longitude_of_ascending_node, -inclination, -argument_of_periapsis]))
     for entry in star_map: entry['coordinates'] = rotation.apply(entry['coordinates'])
