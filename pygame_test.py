@@ -1,16 +1,41 @@
 import pygame
 from random import randint
 import numpy as np
-#import database
 from database import buildSphericalDatabase
 from database import buildCartesianDatabase
 from quaternions import normalized
-import sphere_to_2circle
+from sphere_to_2circles import sphere_to_circle
 
-spherical_database = buildSphericalDatabase()
-star_database = buildCartesianDatabase(spherical_database)
-for entry in star_database:
-    entry['coordinates'] = normalized(entry['coordinates'])
+def generateSkySurface(width, height):
+    sky_surface = pygame.Surface((width, height))
+    spherical_database = buildSphericalDatabase()
+    star_database = buildCartesianDatabase(spherical_database)
+    for entry in star_database:
+        entry['coordinates'] = normalized(entry['coordinates'])
+
+    sphere_xyz = [entry['coordinates'] for entry in star_database]
+    chartPos = sphere_to_circle(sphere_xyz)
+    
+    # Draw north
+    for point in chartPos[0]:
+        z = randint(50, 255)
+        color = (z, z, z)
+        x,y = point
+        x *= int(width/4)
+        y *= int(width/4)
+        x += int(width/4)
+        y += int(height/2)
+        pygame.draw.circle(sky_surface, color, (x, y), 1, 0)        
+    for point in chartPos[1]:
+        z = randint(50, 255)
+        color =(z, z, z)
+        x,y = point
+        x *= int(width/4)
+        y *= int(width/4)
+        x += int(3*width/4)
+        y += int(height/2)
+        pygame.draw.circle(sky_surface, color, (x, y), 1, 0)
+    return sky_surface
 
 white = (255, 255, 255)
 pygame.init()
@@ -24,9 +49,11 @@ save_text = planet_font.render('Save', False, '#907AD6')
 
 pygame.display.set_caption('Exosky!')
 window_surface = pygame.display.set_mode((0, 0), pygame.FULLSCREEN) #or pygame.FULLSCREEN to have the window stay fullscreen (no bar at top) Two numbers indicate minimized size
-
-background = pygame.Surface((3000, 2000))
+size = pygame.display.get_window_size()
+background = pygame.Surface((size[0], size[1]))
+sky_surface = generateSkySurface(size[0], size[1])
 background.fill(pygame.Color('#161525'))
+
 pos = (-1, -1)
 mapping = False
 start = False
@@ -35,10 +62,11 @@ planet_str = "Earth"
 constellation_str = 'Start Charting'
 arr = []
 temp_len = 0
-size = pygame.display.get_window_size()
 
 while True:
     window_surface.blit(background, (0, 0))
+    window_surface.blit(sky_surface, (0,0))
+
     planet_text = planet_font.render(planet_str, False, '#F39237')
     constellation_text = planet_font.render(constellation_str, False, '#907AD6')
     for event in pygame.event.get():
@@ -47,46 +75,6 @@ while True:
                 if(pos[0] != -1):
                     arr.append(pos[0]);arr.append(pos[1]);arr.append(pygame.mouse.get_pos()[0]);arr.append(pygame.mouse.get_pos()[1])
             pos = pygame.mouse.get_pos()
-    #Drawing Star:
-         #0, 0 is top left
-         #1920, 1200 is bot right (computer resolution) for full screen
-         #1920, 1130 is bot right (computer resolution dependant) for windowed full screen
-    '''for i in range(1201):
-        x = randint(50, 255)
-        color = (x, x, x)
-        pygame.draw.circle(window_surface, color,[randint(0, 1920), i], randint(1, 4), 0)
-        pygame.draw.circle(window_surface, color,[randint(0, 1920), i], randint(1, 4), 0)
-        pygame.draw.circle(window_surface, color,[randint(0, 1920), i], randint(1, 4), 0)'''
-    
-    sphere_xyz = [entry['coordinates'] for entry in star_database]
-    chartPos = sphere_to_circle(sphere_xyz)
-    
-    for point in chartPos[0]:
-        
-    for point in chartPos[1]:
-        point[0] *= int(size[0]/8)
-        point[0] += int(3*size[0]/2)
-        point[1] += int(size[1]/2)
-
-
-            
-            z = randint(50, 255)
-            color = (z, z, z)
-            pygame.draw.circle(window_surface, color, (x, y), 1, 0)
-    
-
-            
-'''        ascension = entry['coordinates'][1] #right ascension
-        declination = entry['coordinates'][2] #declination
-        mag = entry['magnitude']      
-        if mag < 6 and mag > 0:
-            mag = int(5/mag)
-            if declination > 0:
-                x = np.cos(ascension)*(1-declination/(np.pi/2))
-                y = np.sin(ascension)*(1-declination/(np.pi/2))
-            else:
-                x = np.cos(ascension)*(1+declination/(np.pi/2))
-                y = np.sin(ascension)*(1+declination/(np.pi/2))'''
     if not(start):
         start_button = pygame.draw.rect(window_surface,'#F39237', pygame.Rect(810, 710, 280, 95),  0, 3)
         window_surface.blit(title_text, (525, 450))
@@ -132,4 +120,3 @@ while True:
             saving = True
             pos = (-1, -1)
     pygame.display.update()
-#declination if positive NOrthern, southern otherwise. 1- (Dec Rad/pi/2) gives radius (norhtern).  1+(Dec Rad/pi/2)
