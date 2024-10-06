@@ -1,7 +1,9 @@
 import pygame
 from random import randint
 import numpy as np
+import  database
 
+star_database = buildCartesianDatabase()
 white = (255, 255, 255)
 pygame.init()
 start_font = pygame.font.Font('./programFonts/font.ttf', 100)
