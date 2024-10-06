@@ -37,7 +37,7 @@ class SearchableDropDown():
     def draw(self, surf):
         pygame.draw.rect(surf, self.menu_color[self.menu_active], self.rect, 0)
         surf.blit(self.text_surf, (self.rect.x+5, self.rect.y+5))
-        surf.blit(self.chosen_text_surf, (self.textx - (self.chosen_text_surf.get_rect()//2), self.texty))
+        surf.blit(self.chosen_text_surf, (self.textx - (self.chosen_text_surf.get_rect().width//2), self.texty))
 
         # copy the box down for all options shown
         if self.draw_dropdown:
