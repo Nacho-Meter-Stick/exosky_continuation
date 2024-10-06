@@ -87,6 +87,7 @@ start_text = start_font.render('Start', False, '#EEE3CE')
 switch_text = planet_font.render('Switch Planets', False, '#2C2A4A')
 exit_text = planet_font.render('Exit', False, '#2C2A4A')
 save_text = planet_font.render('Save', False, '#2C2A4A')
+undo_text = planet_font.render('Undo', False, '#2C2A4A')
 pygame.display.set_caption('Exosky!')
 
 window_surface = pygame.display.set_mode((0, 0), pygame.FULLSCREEN) #or pygame.FULLSCREEN to have the window stay fullscreen (no bar at top) Two numbers indicate minimized size
@@ -166,6 +167,12 @@ while True:
                 if temp_len != len(arr):
                     arr.pop();arr.pop();arr.pop();arr.pop();
             pos = (-1, -1)
+        if mapping:
+            undo_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(70, 80, 110, 60), 0, 3)
+            window_surface.blit(undo_text, (85, 85))
+            if undo_button.collidepoint(pos) and len(arr) > 1:
+                arr.pop();arr.pop();arr.pop();arr.pop();
+                pos = (-1, -1)
         if exit_button.collidepoint(pos):
             exit()
         j = 0;
