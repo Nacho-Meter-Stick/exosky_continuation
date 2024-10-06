@@ -1,5 +1,6 @@
 import numpy as np
 import math
+# All angles must be in radians
 def dist_exo_star(r_star, r_exo, phi_star, phi_exo, theta_star, theta_exo):
     return np.sqrt(r_star**2 + r_exo**2 - 2*r_star*r_exo*np.sin(phi_star)*np.sin(phi_exo)*(np.cos(theta_star-theta_exo)-1))
 def spherical_to_cartesian(obj: np.array[float, float, float]) -> np.array[float, float, float]:
