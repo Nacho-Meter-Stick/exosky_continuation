@@ -61,6 +61,9 @@ def generateSkySurface(width, height):
             x += int(width/4)
             y += int(height/2)
 
+            x = int(x)
+            y = int(y)
+
             coord = (x,y)
 
             pygame.draw.circle(surface=sky_surface, color=color, center=coord, radius=mag, width=0)
@@ -73,6 +76,9 @@ def generateSkySurface(width, height):
             y *= -int(width/4)
             x += int(3*width/4)
             y += int(height/2)
+
+            x = int(x)
+            y = int(y)
 
             coord = (x,y)
             pygame.draw.circle(surface=sky_surface, color=color, center=coord, radius=mag, width=0)
