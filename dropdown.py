@@ -12,28 +12,32 @@ pygame.init()
 planet_font = pygame.font.Font('./programFonts/Cascadia.ttf', 40)
 
 class SearchableDropDown():
-    def __init__(self, menu_color, option_color, txt_color, x, y, w, h, SIZE, options, text="Earth!"):
+    def __init__(self, menu_color, option_color, txt_color, chosen_txt_color, x, y, w, h, options, SIZE, text="Switch Planet!"):
         self.rect = pygame.Rect(x, y, w, h)
-        self.textx = SIZE[0]/2
+        self.textx = SIZE[0]/2 +20
         self.texty = 120
 
         self.menu_color = menu_color
         self.option_color = option_color
         self.txt_color = txt_color
+        self.chosen_txt_color = chosen_txt_color
 
         self.options = options
         self.shownOptions = options
         self.text = text
+        self.chosen = "Earth!"
 
         self.font = planet_font
         self.menu_active = False
         self.draw_dropdown = False
         self.active_option = -1
         self.text_surf = planet_font.render(text, True, self.menu_color[self.menu_active])
+        self.chosen_text_surf = planet_font.render(chosen, True, self.menu_color[self.menu_active])
 
     def draw(self, surf):
         pygame.draw.rect(surf, self.menu_color[self.menu_active], self.rect, 0)
-        surf.blit(self.text_surf, (self.textx + 15, self.texty))
+        surf.blit(self.text_surf, (self.rect.x+5, self.rect.y+5))
+        surf.blit(self.chosen_text_surf, (self.textx, self.texty))
 
         # copy the box down for all options shown
         if self.draw_dropdown:
@@ -74,7 +78,8 @@ class SearchableDropDown():
                     self.text = ""
                 elif self.draw_dropdown and self.active_option >= 0:
                     self.draw_dropdown = False
-                    self.text = self.shownOptions[self.active_option]
+                    self.chosen = self.shownOptions[self.active_option]
+                    self.font.render(self.chosen, True, self.chosen_txt_color)
 
         if not self.search() == None:
             self.shownOptions = self.search()
