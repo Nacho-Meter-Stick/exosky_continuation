@@ -144,7 +144,6 @@ while True:
         #window_surface.blit(planet_text, text_rect)
         if not(saving):
             exoPlanetSelector.draw(window_surface) 
-            window_surface.blit(switch_text, (1450, 20))
             constellation_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(70, 15, 345, 60), 0, 3)
             window_surface.blit(constellation_text, (85, 20))
             exit_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(90, 1115, 110, 60), 0, 3)
