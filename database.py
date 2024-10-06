@@ -36,17 +36,21 @@ def getExoplanetData():
         except:
             continue
         systemDist = float(systemDist[0])
-        systemRightAscension = system.findtext("rightascension"), 
-        systemDeclination = system.findtext("declination")
+        systemRightAscension = convertHMSToRad(str(system.findtext("rightascension")))
+        systemDeclination = convertDMSToRad(str(system.findtext("declination")))
         for planet in system.findall(".//planet"):
-            planetdict = dict(
-                name = planet.findtext("name"),
-                inclination = planet.findtext("inclination"),
-                distance = systemDist,
-                rightascension = systemRightAscension,
-                declination = systemDeclination,
-                description = planet.findtext("description")
-            )
+            try:
+                planetdict = dict(
+                    name = planet.findtext("name"),
+                    inclination = float(planet.findtext("inclination")),
+                    periastron = float(planet.findtext("periastron")),
+                    distance = systemDist,
+                    rightascension = systemRightAscension,
+                    declination = systemDeclination,
+                    description = planet.findtext("description")
+                )
+            except:
+                continue 
             planets.append(planetdict)
     return planets
 
@@ -92,8 +96,4 @@ def shiftCartesianDatabase(cartesian_database: npt.NDArray, new_origin: npt.NDAr
 
 planet_database = getExoplanetData()
 star_database_spherical = buildSphericalDatabase()
-
-for entry in star_database_spherical:
-    print(entry['coordinates'][2])
-
 star_database = buildCartesianDatabase(star_database_spherical)

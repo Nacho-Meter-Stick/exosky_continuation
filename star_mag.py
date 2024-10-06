@@ -1,3 +1,3 @@
 import math
-def delta_star_magnitude(d1: float, d2: float) -> float:
-  return 10*math.log(x=d2/d1, base=100)
+def delta_star_magnitude(d1_squared: float, d2_squared: float) -> float:
+  return 5*math.log(x=d2_squared/d1_squared, base=100)
