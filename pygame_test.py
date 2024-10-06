@@ -77,7 +77,7 @@ for planet in planets:
     planetNames.append(planet['name'])
 
 exoPlanetSelector = SearchableDropDown(
-    [DARK_PURPLE, PURPLE],
+    [ORANGE, DARK_PURPLE],
     [DARK_PURPLE, PURPLE],
     LIGHT,
     50, 50, 250, 50,
