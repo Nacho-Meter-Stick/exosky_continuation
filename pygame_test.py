@@ -81,6 +81,7 @@ exoPlanetSelector = SearchableDropDown(
     [DARK_PURPLE, PURPLE],
     LIGHT,
     1435, 15, 355, 60,
+    size,
     planetNames)
 
 while True:
