@@ -7,13 +7,12 @@ COLOR_ACTIVE = (44, 42, 74)
 COLOR_TEXT = (238, 227, 206)
 COLOR_LIST_INACTIVE = (22, 21, 37)
 COLOR_LIST_ACTIVE = (44, 42, 74)
-SIZE = pygame.display.get_window_size()
 
 pygame.init()
 planet_font = pygame.font.Font('./programFonts/Cascadia.ttf', 40)
 
 class SearchableDropDown():
-    def __init__(self, menu_color, option_color, txt_color, x, y, w, h, options, text="Search an exoplanet!"):
+    def __init__(self, menu_color, option_color, txt_color, x, y, w, h, SIZE, options, text="Search an exoplanet!"):
         self.rect = pygame.Rect(x, y, w, h)
         self.textx = SIZE/2
         self.texty = 120
