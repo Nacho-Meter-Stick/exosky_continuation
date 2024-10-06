@@ -4,7 +4,7 @@ import numpy as np
 from database import buildSphericalDatabase, buildCartesianDatabase, getExoplanetData
 from quaternions import normalized
 from sphere_to_2circles import sphere_to_circle
-from dropdown.py import SearchableDropDown
+from dropdown import SearchableDropDown
 
 # COLORS
 ORANGE = (243, 146, 55)
