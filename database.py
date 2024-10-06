@@ -14,12 +14,13 @@ STAR_ENTRY_TYPE = np.dtype([('identifier', 'U15'), ('coordinates', np.float32, (
 def getExoplanetData():
     planets = []
     for system in oec.findall(".//system"):
-        systemDist = system.findtext("distance"),
+        systemDist = system.findtext("distance")
         try:
-            if type(systemDist[0]) == None or float(systemDist[0]) > 600:
+            if type(systemDist) == None or float(systemDist[0]) > 600:
                 continue
         except:
             continue
+        systemDist = float(systemDist[0])
         systemRightAscension = system.findtext("rightascension"), 
         systemDeclination = system.findtext("declination")
         for planet in system.findall(".//planet"):
