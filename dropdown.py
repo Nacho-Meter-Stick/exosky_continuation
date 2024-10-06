@@ -91,7 +91,7 @@ class SearchableDropDown():
         self.chosen_text_surf = self.font.render(self.chosen, True, self.chosen_txt_color)
 
         # make box longer when text gets too big
-        width = max(200, self.text_surf.get_width()+10)
+        width = max(355, self.text_surf.get_width()+10)
         self.rect.w = width
         return -1
 
