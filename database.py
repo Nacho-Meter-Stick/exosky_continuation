@@ -63,12 +63,13 @@ def getStarDataSpherical() -> npt.NDArray:
 
     return stars
 
-def buildCartesianDatabase() -> npt.NDArray:
-    star_database = getStarDataSpherical()
+def buildCartesianDatabase(spherical_database: npt.NDArray) -> npt.NDArray:
+    star_database = np.copy(spherical_database)
     for entry in star_database:
         r, lon, lat = entry['coordinates']
         entry['coordinates'] = spherical_to_cartesian(r, lat, lon)
     return star_database
 
 planet_database = getExoplanetData()
-star_database = buildCartesianDatabase()
+star_database_spherical = getStarDataSpherical()
+star_database = buildCartesianDatabase(star_database_spherical)
