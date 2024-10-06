@@ -108,9 +108,10 @@ exoPlanetSelector = SearchableDropDown(
     [ORANGE, DARK_PURPLE],
     [DARK_PURPLE, PURPLE],
     LIGHT,
+    ORANGE,
     1435, 15, 355, 60,
-    size,
-    planetNames)
+    planetNames,
+    size)
 
 while True:
     window_surface.blit(background, (0, 0))
