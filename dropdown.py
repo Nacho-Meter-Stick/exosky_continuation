@@ -7,13 +7,16 @@ COLOR_ACTIVE = (44, 42, 74)
 COLOR_TEXT = (238, 227, 206)
 COLOR_LIST_INACTIVE = (22, 21, 37)
 COLOR_LIST_ACTIVE = (44, 42, 74)
+SIZE = pygame.display.get_window_size()
 
 pygame.init()
-FONT = pygame.font.Font('./programFonts/font.ttf', 100)
+planet_font = pygame.font.Font('./programFonts/Cascadia.ttf', 40)
 
 class SearchableDropDown():
     def __init__(self, menu_color, option_color, txt_color, x, y, w, h, options, text="Search an exoplanet!"):
         self.rect = pygame.Rect(x, y, w, h)
+        self.textx = SIZE/2
+        self.texty = 120
 
         self.menu_color = menu_color
         self.option_color = option_color
@@ -23,15 +26,15 @@ class SearchableDropDown():
         self.shownOptions = options
         self.text = text
 
-        self.font = pygame.font.SysFont(None, 30)
+        self.font = planet_font
         self.menu_active = False
         self.draw_dropdown = False
         self.active_option = -1
-        self.text_surf = FONT.render(text, True, self.menu_color[self.menu_active])
+        self.text_surf = planet_font.render(text, True, self.menu_color[self.menu_active])
 
     def draw(self, surf):
         pygame.draw.rect(surf, self.menu_color[self.menu_active], self.rect, 0)
-        surf.blit(self.text_surf, (self.rect.x+5, self.rect.y+5))
+        surf.blit(self.text_surf, (textx, texty))
 
         # copy the box down for all options shown
         if self.draw_dropdown:
