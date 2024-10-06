@@ -4,8 +4,11 @@ from astropy.coordinates import spherical_to_cartesian
 import numpy as np
 import numpy.typing as npt
 import matplotlib.pyplot as plt
+import star_mag
 
 import xml.etree.ElementTree as ET, urllib.request, gzip, io
+
+from star_mag import delta_star_magnitude
 url = "https://github.com/OpenExoplanetCatalogue/oec_gzip/raw/master/systems.xml.gz"
 oec = ET.parse(gzip.GzipFile(fileobj=io.BytesIO(urllib.request.urlopen(url).read())))
 
@@ -77,6 +80,15 @@ def buildCartesianDatabase(spherical_database: npt.NDArray) -> npt.NDArray:
         r, lon, lat = entry['coordinates']
         entry['coordinates'] = spherical_to_cartesian(r, lat, lon)
     return star_database
+
+def shiftCartesianDatabase(cartesian_database: npt.NDArray, new_origin: npt.NDArray[np.float32]) -> npt.NDArray:
+    for entry in cartesian_database:
+        dist_sqr = np.sum(np.multiply(entry['coordinates'], entry['coordinates']))
+        entry['coordinates'] = entry['coordinates'] - new_origin
+        new_dist_sqr = np.sum(np.multiply(entry['coordinates'], entry['coordinates']))
+        entry['magnitude'] += delta_star_magnitude(dist_sqr, new_dist_sqr)
+
+    return cartesian_database
 
 planet_database = getExoplanetData()
 star_database_spherical = buildSphericalDatabase()
