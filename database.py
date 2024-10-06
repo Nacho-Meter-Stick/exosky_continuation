@@ -11,6 +11,18 @@ oec = ET.parse(gzip.GzipFile(fileobj=io.BytesIO(urllib.request.urlopen(url).read
 
 STAR_ENTRY_TYPE = np.dtype([('identifier', 'U15'), ('coordinates', np.float32, (3)), ('magnitude', np.float32), ('spectra', 'U15')])
 
+def convertHMSToRad(HMSstr: str) -> np.float32:
+    HMSparts = HMSstr.split(" ")
+    return np.float32(HMSparts[0]) * math.pi / 12 \
+         + np.float32(HMSparts[1]) * math.pi / 12 / 60 \
+         + np.float32(HMSparts[2]) * math.pi / 12 / 60 / 60
+
+def convertDMSToRad(DMSstr: str) -> np.float32:
+    DMSparts = DMSstr.split(" ")
+    return np.float32(DMSparts[0]) * math.pi / 180 \
+         + np.float32(DMSparts[1]) * math.pi / 180 / 60 \
+         + np.float32(DMSparts[2]) * math.pi / 180 / 60 / 60
+
 def getExoplanetData():
     planets = []
     for system in oec.findall(".//system"):
@@ -42,14 +54,9 @@ def buildSphericalDatabase() -> npt.NDArray:
             if not str(lines.get("Distance (pc)")).replace('.', '1').isnumeric():
                 continue
 
-            RAstr = str(lines.get("RA (hms)")).split(" ")
-            RArad = np.float32(RAstr[0]) * math.pi / 12 \
-                  + np.float32(RAstr[1]) * math.pi / 12 / 60 \
-                  + np.float32(RAstr[2]) * math.pi / 12 / 60 / 60
-            DEstr = str(lines.get("DE (dms)")).split(" ")
-            DErad = np.float32(DEstr[0]) * math.pi / 180 \
-                  + np.float32(DEstr[1]) * math.pi / 180 / 60 \
-                  + np.float32(DEstr[2]) * math.pi / 180 / 60 / 60
+            RArad = convertHMSToRad(str(lines.get("RA (hms)")))
+            DErad = convertDMSToRad(str(lines.get("DE (dms)")))
+
             coordinates = np.array([lines.get("Distance (pc)"), RArad, DErad], dtype=np.float32)
             starTuple = (
                 lines.get("Designation"),
@@ -72,4 +79,8 @@ def buildCartesianDatabase(spherical_database: npt.NDArray) -> npt.NDArray:
 
 planet_database = getExoplanetData()
 star_database_spherical = buildSphericalDatabase()
+
+for entry in star_database_spherical:
+    print(entry['coordinates'][2])
+
 star_database = buildCartesianDatabase(star_database_spherical)
