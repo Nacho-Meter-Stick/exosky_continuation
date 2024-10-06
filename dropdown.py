@@ -32,7 +32,7 @@ class SearchableDropDown():
         self.draw_dropdown = False
         self.active_option = -1
         self.text_surf = planet_font.render(text, True, self.menu_color[self.menu_active])
-        self.chosen_text_surf = planet_font.render(chosen, True, self.menu_color[self.menu_active])
+        self.chosen_text_surf = planet_font.render(self.chosen, True, self.menu_color[self.menu_active])
 
     def draw(self, surf):
         pygame.draw.rect(surf, self.menu_color[self.menu_active], self.rect, 0)
