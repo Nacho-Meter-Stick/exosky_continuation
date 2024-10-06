@@ -61,7 +61,9 @@ def generateSkySurface(width, height):
             x += int(width/4)
             y += int(height/2)
 
-            pygame.draw.circle(surface=sky_surface, color=color, center=(x, y), radius=mag, width=0)
+            coord = (x,y)
+
+            pygame.draw.circle(surface=sky_surface, color=color, center=coord, radius=mag, width=0)
     for entry in projected_starmap[1]:
         if (entry['magnitude'] <= 6):
             x,y,z = entry['coordinates']
@@ -71,7 +73,9 @@ def generateSkySurface(width, height):
             y *= -int(width/4)
             x += int(3*width/4)
             y += int(height/2)
-            pygame.draw.circle(surface=sky_surface, color=color, center=(x, y), radius=mag, width=0)
+
+            coord = (x,y)
+            pygame.draw.circle(surface=sky_surface, color=color, center=coord, radius=mag, width=0)
     return sky_surface
 
 white = (255, 255, 255)
