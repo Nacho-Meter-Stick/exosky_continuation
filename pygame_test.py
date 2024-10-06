@@ -1,5 +1,6 @@
 import pygame
 from random import randint
+import numpy as np
 
 white = (255, 255, 255)
 pygame.init()
@@ -90,3 +91,11 @@ while True:
             saving = True
             pos = (-1, -1)
     pygame.display.update()
+#declination if positive NOrthern, southern otherwise. 1- (Dec Rad/pi/2) gives radius (norhtern).  1+(Dec Rad/pi/2)
+declination, ascension = 0
+if declination > 0:
+    x = np.cos(ascension)*(1-declination/(np.py/2))
+    y = np.sin(ascension)*(1-declination/(np.py/2))
+else:
+    x = np.cos(ascension)*(1+declination/(np.py/2))
+    y = np.sin(ascension)*(1+declination/(np.py/2))
