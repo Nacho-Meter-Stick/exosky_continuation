@@ -1,10 +1,18 @@
 import pygame
 from random import randint
 import numpy as np
-from database import buildSphericalDatabase
-from database import buildCartesianDatabase
+from database import buildSphericalDatabase, buildCartesianDatabase, getExoplanetData
 from quaternions import normalized
 from sphere_to_2circles import sphere_to_circle
+from dropdown.py import SearchableDropDown
+
+# COLORS
+ORANGE = (243, 146, 55)
+DARK = (22, 21, 37)
+DARK_PURPLE = (44, 42, 74)
+PURPLE = (79, 81, 140)
+LIGHT_PURPLE = (144, 122, 214)
+LIGHT = (238, 227, 206)
 
 def generateSkySurface(width, height):
     sky_surface = pygame.Surface((width, height))
@@ -62,6 +70,18 @@ planet_str = "Earth"
 constellation_str = 'Start Charting'
 arr = []
 temp_len = 0
+
+planets = database.getExoplanetData()
+planetNames = []
+for planet in planets:
+    planetNames.append(planet['name'])
+
+exoPlanetSelector = SearchableDropDown(
+    [DARK_PURPLE, PURPLE],
+    [DARK_PURPLE, PURPLE],
+    LIGHT,
+    50, 50, 250, 50,
+    planetNames)
 
 while True:
     window_surface.blit(background, (0, 0))

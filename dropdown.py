@@ -181,18 +181,6 @@ class UserInputBox():
         pygame.draw.rect(surf, self.color, self.rect, 0)
         screen.blit(self.text_surf, (self.rect.x+5, self.rect.y+5))
         
-# print(planetNames)
-planets = database.getExoplanetData()
-planetNames = []
-for planet in planets:
-    planetNames.append(planet['name'])
-
-exoPlanetSelector = SearchableDropDown(
-    [COLOR_INACTIVE, COLOR_ACTIVE],
-    [COLOR_LIST_INACTIVE, COLOR_LIST_ACTIVE],
-    COLOR_TEXT,
-    50, 50, 250, 50,
-    planetNames)
 
 if __name__ == "__main__":
     screen = pygame.display.set_mode((640, 480))
