@@ -79,6 +79,7 @@ class SearchableDropDown():
                 elif self.draw_dropdown and self.active_option >= 0:
                     self.draw_dropdown = False
                     self.chosen = self.shownOptions[self.active_option]
+                    self.text = "Switch Planet!"
                     self.font.render(self.chosen, True, self.chosen_txt_color)
 
         if not self.search() == None:
@@ -87,6 +88,7 @@ class SearchableDropDown():
             self.shownOptions == self.options
 
         self.text_surf = self.font.render(self.text, True, self.txt_color)
+        self.chosen_text_surf = self.font.render(self.chosen, True, self.chosen_txt_color)
 
         # make box longer when text gets too big
         width = max(200, self.text_surf.get_width()+10)

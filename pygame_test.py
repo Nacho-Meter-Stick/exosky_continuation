@@ -112,7 +112,7 @@ for planet in planets:
 exoPlanetSelector = SearchableDropDown(
     [ORANGE, DARK_PURPLE],
     [DARK_PURPLE, PURPLE],
-    LIGHT,
+    DARK,
     ORANGE,
     1435, 15, 355, 60,
     planetNames,
