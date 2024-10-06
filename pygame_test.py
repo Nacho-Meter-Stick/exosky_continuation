@@ -60,6 +60,7 @@ def generateSkySurface(width, height):
             y *= -int(width/4)
             x += int(width/4)
             y += int(height/2)
+
             pygame.draw.circle(surface=sky_surface, color=color, center=(x, y), radius=mag, width=0)
     for entry in projected_starmap[1]:
         if (entry['magnitude'] <= 6):
