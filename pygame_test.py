@@ -3,8 +3,9 @@ from random import randint
 import numpy as np
 from database import buildSphericalDatabase, buildCartesianDatabase, getExoplanetData
 from quaternions import normalized
-from sphere_to_2circles import sphere_to_circle
+from sphere_to_2circles import sphere_to_circle, cartesian_STAR_MAP_to_circles
 from dropdown import SearchableDropDown
+import math
 
 # COLORS
 ORANGE = (243, 146, 55)
@@ -13,36 +14,63 @@ DARK_PURPLE = (44, 42, 74)
 PURPLE = (79, 81, 140)
 LIGHT_PURPLE = (144, 122, 214)
 LIGHT = (238, 227, 206)
+DIM = (75, 75, 75)
 
 def generateSkySurface(width, height):
     sky_surface = pygame.Surface((width, height))
     spherical_database = buildSphericalDatabase()
     star_database = buildCartesianDatabase(spherical_database)
-    for entry in star_database:
-        entry['coordinates'] = normalized(entry['coordinates'])
 
-    sphere_xyz = [entry['coordinates'] for entry in star_database]
-    chartPos = sphere_to_circle(sphere_xyz)
+    projected_starmap = cartesian_STAR_MAP_to_circles(star_database)
+
+    color_grid = DIM
+    color = LIGHT
+
+    pos1 = (int(width/4), int(height/2))
+    pos2 = (int(3*width/4), int(height/2))
+    radius = int(width/4)
+
+    pygame.draw.circle(sky_surface, color_grid, pos1, radius,1)
+    pygame.draw.circle(sky_surface, color_grid, pos2, radius,1)
+    
+    ring = 1
+    while ring < 6:
+        pygame.draw.circle(sky_surface, color_grid, pos1, int(radius * math.tan(math.pi/4 - ring*math.pi/12)), 1)
+        ring += 1
+    ring = 1
+    while ring < 6:
+        pygame.draw.circle(sky_surface, color_grid, pos2, int(radius * math.tan(math.pi/4 - ring*math.pi/12)), 1)
+        ring += 1
+    for i in range(12):
+        pygame.draw.line(sky_surface, color_grid, (pos1), 
+                         (int(radius * math.cos(2*math.pi/12 * i)) + pos1[0], 
+                          int(radius * math.sin(2*math.pi/12 * i)) + pos1[1]), 1)
+    for i in range(12):
+        pygame.draw.line(sky_surface, color_grid, (pos2), 
+                         (int(radius * math.cos(2*math.pi/12 * i)) + pos2[0], 
+                          int(radius * math.sin(2*math.pi/12 * i)) + pos2[1]), 1)
     
     # Draw north
-    for point in chartPos[0]:
-        z = randint(50, 255)
-        color = (z, z, z)
-        x,y = point
-        x *= int(width/4)
-        y *= int(width/4)
-        x += int(width/4)
-        y += int(height/2)
-        pygame.draw.circle(sky_surface, color, (x, y), 1, 0)        
-    for point in chartPos[1]:
-        z = randint(50, 255)
-        color =(z, z, z)
-        x,y = point
-        x *= int(width/4)
-        y *= int(width/4)
-        x += int(3*width/4)
-        y += int(height/2)
-        pygame.draw.circle(sky_surface, color, (x, y), 1, 0)
+    for entry in projected_starmap[0]:
+        if (entry['magnitude'] <= 6):
+            x,y,z = entry['coordinates']
+            mag = int(6-entry['magnitude'])
+
+            x *= int(width/4)
+            y *= -int(width/4)
+            x += int(width/4)
+            y += int(height/2)
+            pygame.draw.circle(sky_surface, color, (x, y), mag, 0)        
+    for entry in projected_starmap[1]:
+        if (entry['magnitude'] <= 6):
+            x,y,z = entry['coordinates']
+            mag = int(6-entry['magnitude'])
+
+            x *= int(width/4)
+            y *= -int(width/4)
+            x += int(3*width/4)
+            y += int(height/2)
+            pygame.draw.circle(sky_surface, color, (x, y), mag, 0)
     return sky_surface
 
 white = (255, 255, 255)
@@ -71,7 +99,7 @@ constellation_str = 'Start Charting'
 arr = []
 temp_len = 0
 
-planets = database.getExoplanetData()
+planets = getExoplanetData()
 planetNames = []
 for planet in planets:
     planetNames.append(planet['name'])
@@ -80,16 +108,15 @@ exoPlanetSelector = SearchableDropDown(
     [ORANGE, DARK_PURPLE],
     [DARK_PURPLE, PURPLE],
     LIGHT,
-    ORANGE,
     1435, 15, 355, 60,
-    planetNames,
-    size)
+    size,
+    planetNames)
 
 while True:
     window_surface.blit(background, (0, 0))
     window_surface.blit(sky_surface, (0,0))
 
-    planet_text = planet_font.render(planet_str, False, '#F39237')
+    # planet_text = planet_font.render(planet_str, False, '#F39237')
     constellation_text = planet_font.render(constellation_str, False, '#2C2A4A')
     event_list = pygame.event.get()
     for event in event_list:
@@ -107,8 +134,8 @@ while True:
         if start_button.collidepoint(pos):
             start = True
     else:
-        text_rect = planet_text.get_rect(center=(size[0]/2, 120))
-        window_surface.blit(planet_text, text_rect)
+        #text_rect = planet_text.get_rect(center=(size[0]/2, 120))
+        #window_surface.blit(planet_text, text_rect)
         if not(saving):
             exoPlanetSelector.draw(window_surface) 
             window_surface.blit(switch_text, (1450, 20))
