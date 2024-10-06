@@ -14,8 +14,8 @@ Ever since the dawn of civilization humans have looked at the sky and dreamed of
 ### Space Agency Data
 [NASA Exoplanet Archive](https://exoplanetarchive.ipac.caltech.edu/index.html)
 
-References
-[Open Exoplanet Catalogue](https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue)
-[Astroquery](https://github.com/cds-astro/astroquery)
-[The Hipparcos and Tycho Catalogues](https://www.cosmos.esa.int/web/hipparcos/catalogues)
-[VizieR Catalogue Access Tool](https://vizier.cds.unistra.fr/viz-bin/VizieR)
+### Other References
+- [Open Exoplanet Catalogue](https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue)
+- [Astroquery](https://github.com/cds-astro/astroquery)
+- [The Hipparcos and Tycho Catalogues](https://www.cosmos.esa.int/web/hipparcos/catalogues)
+- [VizieR Catalogue Access Tool](https://vizier.cds.unistra.fr/viz-bin/VizieR)
