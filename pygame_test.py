@@ -141,8 +141,8 @@ while True:
     text_rect = title_text.get_rect(center=(size[0]/2, 50))
     window_surface.blit(title_text, text_rect)
     if not(start):
-        start_button = pygame.draw.rect(window_surface,'#F39237', pygame.Rect(820, 1000, 280, 90),  0, 3)
-        text_rect = start_text.get_rect(center=(size[0]/2, 1045))
+        start_button = pygame.draw.rect(window_surface,'#F39237', pygame.Rect(size[0]/2 - 280/2, size[1] - 100, 280, 90),  0, 3)
+        text_rect = start_text.get_rect(center=(size[0]/2, start_button.y + int(start_button.height/2)))
         window_surface.blit(start_text, text_rect)
         if start_button.collidepoint(pos):
             start = True
