@@ -3,8 +3,15 @@ from random import randint
 import numpy as np
 #import database
 from database import buildSphericalDatabase
+from database import buildCartesianDatabase
+from quaternions import normalized
+import sphere_to_2circle
 
-star_database = buildSphericalDatabase()
+spherical_database = buildSphericalDatabase()
+star_database = buildCartesianDatabase(spherical_database)
+for entry in star_database:
+    entry['coordinates'] = normalized(entry['coordinates'])
+
 white = (255, 255, 255)
 pygame.init()
 start_font = pygame.font.Font('./programFonts/font.ttf', 100)
@@ -50,10 +57,28 @@ while True:
         pygame.draw.circle(window_surface, color,[randint(0, 1920), i], randint(1, 4), 0)
         pygame.draw.circle(window_surface, color,[randint(0, 1920), i], randint(1, 4), 0)
         pygame.draw.circle(window_surface, color,[randint(0, 1920), i], randint(1, 4), 0)'''
-    for entry in star_database:
-        ascension = entry['coordinates'][1] #right ascension
+    
+    sphere_xyz = [entry['coordinates'] for entry in star_database]
+    chartPos = sphere_to_circle(sphere_xyz)
+    
+    for point in chartPos[0]:
+        
+    for point in chartPos[1]:
+        point[0] *= int(size[0]/8)
+        point[0] += int(3*size[0]/2)
+        point[1] += int(size[1]/2)
+
+
+            
+            z = randint(50, 255)
+            color = (z, z, z)
+            pygame.draw.circle(window_surface, color, (x, y), 1, 0)
+    
+
+            
+'''        ascension = entry['coordinates'][1] #right ascension
         declination = entry['coordinates'][2] #declination
-        mag = entry['magnitude']
+        mag = entry['magnitude']      
         if mag < 6 and mag > 0:
             mag = int(5/mag)
             if declination > 0:
@@ -61,12 +86,7 @@ while True:
                 y = np.sin(ascension)*(1-declination/(np.pi/2))
             else:
                 x = np.cos(ascension)*(1+declination/(np.pi/2))
-                y = np.sin(ascension)*(1+declination/(np.pi/2))
-            x += int(size[0]/2)
-            y += int(size[1]/2)
-            z = randint(50, 255)
-            color = (z, z, z)
-            pygame.draw.circle(window_surface, color, (x, y), 1, 0)    
+                y = np.sin(ascension)*(1+declination/(np.pi/2))'''
     if not(start):
         start_button = pygame.draw.rect(window_surface,'#F39237', pygame.Rect(810, 710, 280, 95),  0, 3)
         window_surface.blit(title_text, (525, 450))
