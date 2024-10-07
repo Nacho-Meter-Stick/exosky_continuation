@@ -57,6 +57,7 @@ def findPlanet(planetData, planetName):
     for planet in planetData:
         if planet["name"] == planetName:
             return planet
+    return -1
 
 def buildSphericalDatabase() -> npt.NDArray:
     starslist: list[tuple] = []
