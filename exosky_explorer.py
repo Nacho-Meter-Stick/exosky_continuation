@@ -166,17 +166,13 @@ while True:
         changed = exoPlanetSelector.update(event_list)
         if changed:
             planet = findPlanet(planets, exoPlanetSelector.getChosen())
-            print(f"Selected planet: {planet['name']}")
             right_ascension = planet['rightascension']
             declination = planet['declination']
             distance = planet['distance']
             offset_vec = np.array(spherical_to_cartesian(distance, declination, right_ascension), dtype=np.float64)
-            print(f"State vector for HIP 1: {star_database[0]}")
             star_database = shiftCartesianDatabase(star_database, np.add(offset_vec,sol_pos))
-            print(f"State vector for HIP 1 after shift: {star_database[0]}")
             sol_pos = -offset_vec
 
-            print(f"New Sol pos: f{sol_pos}")
             sky_surface = generateSkySurface(size[0], size[1])
 
         if constellation_button.collidepoint(pos):
