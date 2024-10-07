@@ -93,6 +93,16 @@ def shiftCartesianDatabase(cartesian_database: npt.NDArray, new_origin: npt.NDAr
 
     return cartesian_database
 
+def filterStarDatabase(star_database: npt.NDArray, max_magnitude: np.float32):
+    starslist: list[tuple] = []
+    for entry in star_database:
+        if entry['magnitude'] > max_magnitude:
+            continue
+        starslist.append(entry)
+
+    stars = np.array(starslist, dtype=STAR_ENTRY_TYPE)
+    return stars
+
 planet_database = getExoplanetData()
 star_database_spherical = buildSphericalDatabase()
 star_database = buildCartesianDatabase(star_database_spherical)
