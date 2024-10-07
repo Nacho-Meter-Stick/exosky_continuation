@@ -30,7 +30,7 @@ def getExoplanetData():
     for system in oec.findall(".//system"):
         systemDist = system.findtext("distance")
         try:
-            if type(systemDist) == None or float(systemDist[0]) > 600:
+            if type(systemDist) is None or float(systemDist[0]) > 600:
                 continue
         except:
             continue
