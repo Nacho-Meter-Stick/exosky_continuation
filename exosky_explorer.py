@@ -125,22 +125,27 @@ pos = (-1, -1)
 mapping = False
 start = False
 saving = False
+check = True
 planet_str = "Earth"
 constellation_str = 'Start Charting'
 arr = []
 temp_len = 0
+border_margin = 10
+text_margin = 10
+radii = 3
 
 planets = getExoplanetData()
 planetNames = []
 for planet in planets:
     planetNames.append(planet['name'])
 
+dimensions = (355, 60)
 exoPlanetSelector = SearchableDropDown(
     [ORANGE, PURPLE],
     [PURPLE, LIGHT_PURPLE],
     DARK,
     ORANGE,
-    1435, 15, 355, 60,
+    size[0]-dimensions[0]-border_margin*3, border_margin, dimensions[0], dimensions[1],
     planetNames,
     size)
 
@@ -156,28 +161,48 @@ while True:
     for event in event_list:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if(mapping):
+                check = True
                 if(pos[0] != -1):
                     arr.append(pos[0]);arr.append(pos[1]);arr.append(pygame.mouse.get_pos()[0]);arr.append(pygame.mouse.get_pos()[1])
+                else:
+                    check = False
             pos = pygame.mouse.get_pos()
-    text_rect = title_text.get_rect(center=(size[0]/2, 50))
-    window_surface.blit(title_text, text_rect)
+
+    text_width = title_text.get_width()
+    text_height = title_text.get_height()
+    window_surface.blit(title_text, (size[0]/2-text_width/2, text_margin))
     if not(start):
-        start_button = pygame.draw.rect(window_surface,'#F39237', pygame.Rect(size[0]/2 - 280/2, size[1] - 100, 280, 90),  0, 3)
-        text_rect = start_text.get_rect(center=(size[0]/2, start_button.y + int(start_button.height/2)))
-        window_surface.blit(start_text, text_rect)
+        
+        text_width = start_text.get_width()
+        text_height = start_text.get_height()
+        dimensions = (text_width+2*text_margin, text_height+2*text_margin)
+        start_button = pygame.draw.rect(window_surface,'#F39237', pygame.Rect(size[0]/2 - dimensions[0]/2, size[1] - dimensions[1]-border_margin, dimensions[0], dimensions[1]),  0, radii)
+        window_surface.blit(start_text, (size[0]/2 - text_width/2,  size[1] - dimensions[1] - border_margin + text_margin))
         if start_button.collidepoint(pos):
             start = True
     else:
         #text_rect = planet_text.get_rect(center=(size[0]/2, 120))
         #window_surface.blit(planet_text, text_rect)
         if not(saving):
-            exoPlanetSelector.draw(window_surface) 
-            constellation_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(70, 10, 345, 60), 0, 3)
-            window_surface.blit(constellation_text, (85, 20))
-            exit_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(90, size[1]-80, 110, 60), 0, 3)
-            window_surface.blit(exit_text, (100, 1120))
-            save_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(size[0]-135, size[1]-80, 115, 60), 0, 3)
-            window_surface.blit(save_text, (1720, 1120))
+            exoPlanetSelector.draw(window_surface)
+            
+            text_width = constellation_text.get_width()
+            text_height = constellation_text.get_height()
+            dimensions = (text_width+2*text_margin, text_height+2*text_margin)
+            constellation_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(border_margin*3, border_margin, dimensions[0], dimensions[1]), 0, radii)
+            window_surface.blit(constellation_text, (border_margin*3+text_margin, border_margin+text_margin))
+            
+            text_width = exit_text.get_width()
+            text_height = exit_text.get_height()
+            dimensions = (text_width+2*text_margin, text_height+2*text_margin)
+            exit_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(border_margin*3, size[1] - dimensions[1] - border_margin, dimensions[0], dimensions[1]), 0, radii)
+            window_surface.blit(exit_text, (border_margin*3+text_margin, size[1] - dimensions[1]-border_margin + text_margin))
+            
+            text_width = save_text.get_width()
+            text_height = save_text.get_height()
+            dimensions = (text_width+2*text_margin, text_height+2*text_margin)
+            save_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(size[0] - dimensions[0] - border_margin*3, size[1] - dimensions[1]-border_margin, dimensions[0], dimensions[1]),  0, radii)
+            window_surface.blit(save_text, (size[0] - dimensions[0] - border_margin*3+text_margin,  size[1] - dimensions[1]-border_margin + text_margin))
 
         changed = exoPlanetSelector.update(event_list)
         if changed:
@@ -199,14 +224,31 @@ while True:
             else:
                 constellation_str = 'Start Charting'
                 mapping = False
-                if temp_len != len(arr):
+                if temp_len != len(arr) and check:
                     arr.pop();arr.pop();arr.pop();arr.pop();
             pos = (-1, -1)
         if mapping:
-            undo_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(70, 80, 110, 60), 0, 3)
-            window_surface.blit(undo_text, (85, 85))
-            if undo_button.collidepoint(pos) and len(arr) > 1:
-                arr.pop();arr.pop();arr.pop();arr.pop();
+            text_width = undo_text.get_width()
+            text_height = undo_text.get_height()
+            dimensions = (text_width+2*text_margin, text_height+2*text_margin)
+            text_width = constellation_text.get_width()
+            text_height = constellation_text.get_height()
+            dimensions2 = (text_width+2*text_margin, text_height+2*text_margin)
+            undo_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(border_margin*3, dimensions2[1]+2*border_margin, dimensions[0], dimensions[1]), 0, radii)
+            window_surface.blit(undo_text, (border_margin*3+text_margin, dimensions2[1]+2*border_margin+text_margin))
+            
+            if undo_button.collidepoint(pos) and len(arr) >= 4:
+                if check:
+                    arr.pop();arr.pop();arr.pop();arr.pop();
+                if(len(arr) >= 4):
+                   pos = (arr[len(arr)-4], arr[len(arr)-3])
+                   arr.pop();arr.pop();arr.pop();arr.pop()
+                   if len(arr) == 0:
+                       pos = (-1, -1)
+                else:
+                    pos = (-1, -1)
+                check = False
+            elif undo_button.collidepoint(pos):
                 pos = (-1, -1)
         if exit_button.collidepoint(pos):
             exit()
