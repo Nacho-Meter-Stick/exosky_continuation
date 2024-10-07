@@ -53,6 +53,11 @@ def getExoplanetData():
             planets.append(planetdict)
     return planets
 
+def findPlanet(planetData, planetName):
+    for planet in planetData:
+        if planet["name"] == planetName:
+            return planet
+
 def buildSphericalDatabase() -> npt.NDArray:
     starslist: list[tuple] = []
     with open("HIP database.csv", mode="r") as HIP_database:
