@@ -50,13 +50,22 @@ def getExoplanetData():
             except:
                 continue 
             planets.append(planetdict)
-    print(planets)
+
+    planets.append(dict(
+        name = "Earth",
+        inclination = 0,
+        periastron = 0,
+        distance = 0,
+        rightascension = 0,
+        declination = 0,
+        description = "Home. Discovered by humanity et al."))
     return planets
 
 def findPlanet(planetData, planetName):
     for planet in planetData:
         if planet["name"] == planetName:
             return planet
+    return -1
 
 def buildSphericalDatabase() -> npt.NDArray:
     starslist: list[tuple] = []
