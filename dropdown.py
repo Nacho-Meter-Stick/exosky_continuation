@@ -25,7 +25,7 @@ class SearchableDropDown():
         self.options = options
         self.shownOptions = options
         self.text = text
-        self.chosen = "Earth!"
+        self.chosen = "Earth"
 
         self.font = planet_font
         self.menu_active = False
@@ -101,6 +101,10 @@ class SearchableDropDown():
             if self.text in option:
                 matches.append(option)
         self.shownOptions = matches
+
+    def getChosen():
+        return self.chosen
+
 
 
 class DropDown():
