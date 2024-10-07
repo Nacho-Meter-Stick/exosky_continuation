@@ -17,6 +17,16 @@ LIGHT_PURPLE = (144, 122, 214)
 LIGHT = (238, 227, 206)
 DIM = (75, 75, 75)
 
+spectral_color_dict = dict(
+    O=(50, 21, 199),
+    B=(168, 183, 242),
+    A=(255, 255, 255),
+    F=(240, 240, 200),
+    G=(230, 230, 160),
+    K=(230, 100, 50),
+    M=(250, 30, 50),
+)
+
 spherical_database = buildSphericalDatabase()
 star_database = buildCartesianDatabase(spherical_database)
 print(star_database[0])
@@ -29,7 +39,6 @@ def generateSkySurface(width, height):
     projected_starmap = cartesian_STAR_MAP_to_circles(star_database)
 
     color_grid = DIM
-    color = LIGHT
 
     pos1 = (int(width/4), int(height/2))
     pos2 = (int(3*width/4), int(height/2))
@@ -57,6 +66,8 @@ def generateSkySurface(width, height):
     
     # Draw north
     for entry in projected_starmap[0]:
+        if len(entry['spectra']) == 0: color = LIGHT
+        else: color = spectral_color_dict.get(entry['spectra'][0], LIGHT)
         if (entry['magnitude'] <= 10):
             x,y,z = entry['coordinates']
             mag = int(6-entry['magnitude'])
@@ -73,6 +84,9 @@ def generateSkySurface(width, height):
 
             pygame.draw.circle(surface=sky_surface, color=color, center=coord, radius=mag, width=0)
     for entry in projected_starmap[1]:
+        if len(entry['spectra']) == 0: color = LIGHT
+        else: color = spectral_color_dict.get(entry['spectra'][0], LIGHT)
+
         if (entry['magnitude'] <= 10):
             x,y,z = entry['coordinates']
             mag = int(6-entry['magnitude'])
@@ -129,6 +143,8 @@ exoPlanetSelector = SearchableDropDown(
     1435, 15, 355, 60,
     planetNames,
     size)
+
+
 
 while True:
     window_surface.blit(background, (0, 0))
