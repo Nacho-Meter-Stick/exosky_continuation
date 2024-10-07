@@ -19,15 +19,15 @@ def sphere_to_circle(sphere_xyzs: list[tuple[float, float, float]]) -> tuple[lis
 def cartesian_STAR_MAP_to_circles(star_map: npt.NDArray) -> tuple[npt.NDArray, npt.NDArray]:
     disc_entries_top = []
     disc_entries_bottom = []
-    for entry in star_map:
-        entry_copy = np.copy(entry)
-        entry_copy['coordinates'] = normalized(entry_copy['coordinates'])
-        x, y, z = entry_copy['coordinates']
+    star_copy = np.copy(star_map)
+    for entry in star_copy:
+        entry['coordinates'] = normalized(entry['coordinates'])
+        x, y, z = entry['coordinates']
         if z > 0:
-            entry_copy['coordinates'] = [(-x/(z+1)), y/(z+1), 1]
-            disc_entries_top.append(entry_copy)
+            entry['coordinates'] = [(-x/(z+1)), y/(z+1), 1]
+            disc_entries_top.append(entry)
         else: 
-            entry_copy['coordinates'] = [(-x/(z-1)), -y/(z-1), -1]
-            disc_entries_bottom.append(entry_copy)
+            entry['coordinates'] = [(-x/(z-1)), -y/(z-1), -1]
+            disc_entries_bottom.append(entry)
 
     return (np.array(disc_entries_top, dtype=STAR_ENTRY_TYPE), np.array(disc_entries_bottom, dtype=STAR_ENTRY_TYPE))

@@ -30,11 +30,10 @@ def getExoplanetData():
     for system in oec.findall(".//system"):
         systemDist = system.findtext("distance")
         try:
-            if type(systemDist) == None or float(systemDist[0]) > 600:
+            if type(systemDist) is None or float(systemDist[0]) > 600:
                 continue
         except:
             continue
-        systemDist = float(systemDist[0])
         systemRightAscension = convertHMSToRad(str(system.findtext("rightascension")))
         systemDeclination = convertDMSToRad(str(system.findtext("declination")))
         for planet in system.findall(".//planet"):
@@ -43,7 +42,7 @@ def getExoplanetData():
                     name = planet.findtext("name"),
                     inclination = float(planet.findtext("inclination")),
                     periastron = float(planet.findtext("periastron")),
-                    distance = systemDist,
+                    distance = float(systemDist),
                     rightascension = systemRightAscension,
                     declination = systemDeclination,
                     description = planet.findtext("description")
@@ -51,6 +50,7 @@ def getExoplanetData():
             except:
                 continue 
             planets.append(planetdict)
+    print(planets)
     return planets
 
 def findPlanet(planetData, planetName):
@@ -90,13 +90,16 @@ def buildCartesianDatabase(spherical_database: npt.NDArray) -> npt.NDArray:
     return star_database
 
 def shiftCartesianDatabase(cartesian_database: npt.NDArray, new_origin: npt.NDArray[np.float32]) -> npt.NDArray:
-    for entry in cartesian_database:
-        dist_sqr = np.sum(np.multiply(entry['coordinates'], entry['coordinates']))
-        entry['coordinates'] = entry['coordinates'] - new_origin
-        new_dist_sqr = np.sum(np.multiply(entry['coordinates'], entry['coordinates']))
+    new_database = np.copy(cartesian_database)
+    for entry in new_database:
+        x1,y1,z1 = entry['coordinates']
+        dist_sqr = x1*x1 + y1*y1 + z1*z1
+        x2,y2,z2 = entry['coordinates'] - new_origin
+        new_dist_sqr = x2*x2 + y2*y2 + z2*z2
+        entry['coordinates'] = np.array([x2,y2,z2], dtype=np.float64)
         entry['magnitude'] += delta_star_magnitude(dist_sqr, new_dist_sqr)
 
-    return cartesian_database
+    return new_database
 
 def filterStarDatabase(star_database: npt.NDArray, max_magnitude: np.float32):
     starslist: list[tuple] = []
@@ -107,7 +110,3 @@ def filterStarDatabase(star_database: npt.NDArray, max_magnitude: np.float32):
 
     stars = np.array(starslist, dtype=STAR_ENTRY_TYPE)
     return stars
-
-planet_database = getExoplanetData()
-star_database_spherical = buildSphericalDatabase()
-star_database = buildCartesianDatabase(star_database_spherical)
