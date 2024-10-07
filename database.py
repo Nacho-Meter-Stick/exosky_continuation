@@ -51,6 +51,15 @@ def getExoplanetData():
             except:
                 continue 
             planets.append(planetdict)
+    planets.append(dict(
+        name = "Earth",
+        inclination = 0,
+        periastron = 0,
+        distance = 0,
+        rightascension = 0,
+        declination = 0,
+        description = "Home. Discovered by humanity et al."
+    ))
     return planets
 
 def findPlanet(planetData, planetName):
