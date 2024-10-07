@@ -1,7 +1,8 @@
+from astropy.coordinates import spherical_to_cartesian
 import pygame
 from random import randint
 import numpy as np
-from database import buildSphericalDatabase, buildCartesianDatabase, getExoplanetData
+from database import buildSphericalDatabase, buildCartesianDatabase, getExoplanetData, findPlanet, shiftCartesianDatabase
 from quaternions import normalized
 from sphere_to_2circles import sphere_to_circle, cartesian_STAR_MAP_to_circles
 from dropdown import SearchableDropDown
@@ -16,10 +17,14 @@ LIGHT_PURPLE = (144, 122, 214)
 LIGHT = (238, 227, 206)
 DIM = (75, 75, 75)
 
+spherical_database = buildSphericalDatabase()
+star_database = buildCartesianDatabase(spherical_database)
+print(star_database[0])
+
+sol_pos = np.array([0,0,0], dtype=np.float64)
+
 def generateSkySurface(width, height):
     sky_surface = pygame.Surface((width, height))
-    spherical_database = buildSphericalDatabase()
-    star_database = buildCartesianDatabase(spherical_database)
 
     projected_starmap = cartesian_STAR_MAP_to_circles(star_database)
 
@@ -52,7 +57,7 @@ def generateSkySurface(width, height):
     
     # Draw north
     for entry in projected_starmap[0]:
-        if (entry['magnitude'] <= 6):
+        if (entry['magnitude'] <= 10):
             x,y,z = entry['coordinates']
             mag = int(6-entry['magnitude'])
 
@@ -68,7 +73,7 @@ def generateSkySurface(width, height):
 
             pygame.draw.circle(surface=sky_surface, color=color, center=coord, radius=mag, width=0)
     for entry in projected_starmap[1]:
-        if (entry['magnitude'] <= 6):
+        if (entry['magnitude'] <= 10):
             x,y,z = entry['coordinates']
             mag = int(6-entry['magnitude'])
 
@@ -151,16 +156,24 @@ while True:
         #window_surface.blit(planet_text, text_rect)
         if not(saving):
             exoPlanetSelector.draw(window_surface) 
-            constellation_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(70, 15, 345, 60), 0, 3)
+            constellation_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(70, 10, 345, 60), 0, 3)
             window_surface.blit(constellation_text, (85, 20))
-            exit_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(90, 1115, 110, 60), 0, 3)
+            exit_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(90, size[1]-80, 110, 60), 0, 3)
             window_surface.blit(exit_text, (100, 1120))
-            save_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(1710, 1115, 115, 60), 0, 3)
+            save_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(size[0]-135, size[1]-80, 115, 60), 0, 3)
             window_surface.blit(save_text, (1720, 1120))
 
-        selected_option = exoPlanetSelector.update(event_list)
-        if selected_option >= 0:
-            exoPlanetSelector.chosen = exoPlanetSelector.options[selected_option]
+        changed = exoPlanetSelector.update(event_list)
+        if changed:
+            planet = findPlanet(planets, exoPlanetSelector.getChosen())
+            right_ascension = planet['rightascension']
+            declination = planet['declination']
+            distance = planet['distance']
+            offset_vec = np.array(spherical_to_cartesian(distance, declination, right_ascension), dtype=np.float64)
+            star_database = shiftCartesianDatabase(star_database, np.add(offset_vec,sol_pos))
+            sol_pos = -offset_vec
+
+            sky_surface = generateSkySurface(size[0], size[1])
 
         if constellation_button.collidepoint(pos):
             if constellation_str == 'Start Charting':

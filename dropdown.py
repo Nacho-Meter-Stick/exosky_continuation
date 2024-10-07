@@ -64,6 +64,7 @@ class SearchableDropDown():
             self.draw_dropdown = False
 
         # event handler
+        changed = False
         for event in event_list:
             if event.type == pygame.KEYDOWN:
                 if not self.menu_active:
@@ -79,10 +80,11 @@ class SearchableDropDown():
                 elif self.draw_dropdown and self.active_option >= 0:
                     self.draw_dropdown = False
                     self.chosen = self.shownOptions[self.active_option]
+                    changed = True
                     self.text = "Switch Planet!"
                     self.font.render(self.chosen, True, self.chosen_txt_color)
 
-        if not self.search() == None:
+        if self.search() is not None:
             self.shownOptions = self.search()
         else:
             self.shownOptions == self.options
@@ -93,7 +95,7 @@ class SearchableDropDown():
         # make box longer when text gets too big
         width = max(355, self.text_surf.get_width()+10)
         self.rect.w = width
-        return -1
+        return changed
 
     def search(self):
         matches = []
@@ -102,7 +104,7 @@ class SearchableDropDown():
                 matches.append(option)
         self.shownOptions = matches
 
-    def getChosen():
+    def getChosen(self):
         return self.chosen
 
 if __name__ == "__main__":
