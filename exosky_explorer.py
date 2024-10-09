@@ -233,7 +233,7 @@ while True:
         constellations[planetName].append([])
         planetName = exoPlanetSelector.getChosen()
         planet = findPlanet(PLANETS, planetName)
-        if planetName not in arr: constellations[planetName] = [[]]
+        if planetName not in constellations: constellations[planetName] = [[]]
         offset_vec = np.array(spherical_to_cartesian(planet['distance'], 
                                                      planet['declination'], 
                                                      planet['rightascension']), dtype=np.float64)
