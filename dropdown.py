@@ -1,6 +1,4 @@
 import pygame
-import database
-import time
 
 COLOR_INACTIVE = (22, 21, 37)
 COLOR_ACTIVE = (44, 42, 74)
@@ -9,12 +7,12 @@ COLOR_LIST_INACTIVE = (22, 21, 37)
 COLOR_LIST_ACTIVE = (44, 42, 74)
 
 pygame.init()
-planet_font = pygame.font.Font('./programFonts/Cascadia.ttf', 40)
+PLANET_FONT = pygame.font.Font('./programFonts/Cascadia.ttf', 40)
 
 class SearchableDropDown():
     def __init__(self, menu_color, option_color, txt_color, chosen_txt_color, x, y, w, h, options, SIZE, text="Switch Planet!"):
         self.rect = pygame.Rect(x, y, w, h)
-        self.textx = SIZE[0]/2 +20
+        self.textx = int(SIZE[0]/2)
         self.texty = 120
 
         self.menu_color = menu_color
@@ -27,26 +25,41 @@ class SearchableDropDown():
         self.text = text
         self.chosen = "Earth"
 
-        self.font = planet_font
+        self.font = PLANET_FONT
         self.menu_active = False
         self.draw_dropdown = False
         self.active_option = -1
         self.text_surf = self.font.render(text, True, self.menu_color[self.menu_active])
         self.chosen_text_surf = self.font.render(self.chosen, True, self.menu_color[self.menu_active])
 
-    def draw(self, surf):
+    def draw_planetName_on(self, surf, y=None):
+        if y is None:
+            surf.blit(self.chosen_text_surf, (self.textx - (self.chosen_text_surf.get_rect().width//2), self.texty))
+        else:
+            surf.blit(self.chosen_text_surf, (self.textx - (self.chosen_text_surf.get_rect().width//2), y))
+        return
+
+    def draw_dropdown_on(self, surf):
         pygame.draw.rect(surf, self.menu_color[self.menu_active], self.rect, 0)
         surf.blit(self.text_surf, (self.rect.x+5, self.rect.y+5))
-        surf.blit(self.chosen_text_surf, (self.textx - (self.chosen_text_surf.get_rect().width//2), self.texty))
 
         # copy the box down for all options shown
         if self.draw_dropdown:
             for i, text in enumerate(self.shownOptions):
                 rect = self.rect.copy()
                 rect.y += (i+1) * self.rect.height
-                pygame.draw.rect(surf, self.option_color[1 if i == self.active_option else 0], rect, 0)
+                pygame.draw.rect(surf, self.option_color[(i == self.active_option)], rect, 0)
                 text = self.font.render(text, 1, self.txt_color)
                 surf.blit(text, text.get_rect(center = rect.center))
+
+    def pos_is_not_on_menu(self, pos):
+        if self.rect.collidepoint(pos): return False
+        if self.draw_dropdown:
+            for i, text in enumerate(self.shownOptions):
+                rect = self.rect.copy()
+                rect.y += (i+1) * self.rect.height
+                if rect.collidepoint(pos): return False
+        return True
 
     def update(self, event_list):
         mpos = pygame.mouse.get_pos()
@@ -79,8 +92,10 @@ class SearchableDropDown():
                     self.text = ""
                 elif self.draw_dropdown and self.active_option >= 0:
                     self.draw_dropdown = False
-                    self.chosen = self.shownOptions[self.active_option]
-                    changed = True
+                    new_chosen = self.shownOptions[self.active_option]
+                    if new_chosen != self.chosen:
+                        self.chosen = new_chosen
+                        changed = True
                     self.text = "Switch Planet!"
                     self.font.render(self.chosen, True, self.chosen_txt_color)
 
@@ -106,26 +121,3 @@ class SearchableDropDown():
 
     def getChosen(self):
         return self.chosen
-
-if __name__ == "__main__":
-    screen = pygame.display.set_mode((640, 480))
-    dropDownSurf = pygame.Surface((640, 480))
-
-    is_running = True
-    while is_running:
-        event_list = pygame.event.get()
-        for event in pygame.event.get():
-            # quit when needed
-            if event.type == pygame.QUIT:
-                is_running = False
-
-        # update dropdown
-        selected_option = exoPlanetSelector.update(event_list)
-        if selected_option >= 0:
-            exoPlanetSelector.chosen = exoPlanetSelector.options[selected_option]
-
-        #screen.blit(dropDownSurf, (0, 0), area=pygame.rect(50, 50, 200, 400))
-        screen.fill((238, 227, 206))
-        exoPlanetSelector.draw(screen)
-        pygame.display.update()
-        #time.sleep(10)

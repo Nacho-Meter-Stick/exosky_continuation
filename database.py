@@ -3,8 +3,6 @@ import math
 from astropy.coordinates import spherical_to_cartesian
 import numpy as np
 import numpy.typing as npt
-import matplotlib.pyplot as plt
-from star_mag import delta_star_magnitude
 
 import xml.etree.ElementTree as ET, urllib.request, gzip, io
 
@@ -13,17 +11,22 @@ oec = ET.parse(gzip.GzipFile(fileobj=io.BytesIO(urllib.request.urlopen(url).read
 
 STAR_ENTRY_TYPE = np.dtype([('identifier', 'U15'), ('coordinates', np.float32, (3)), ('magnitude', np.float32), ('spectra', 'U15')])
 
+def delta_star_magnitude(d1_squared: float, d2_squared: float) -> float:
+    # delta_m = 5 * math.log(d2)/math.log(10) - 5 * math.log(d1)/math.log(10)
+    # delta_m = 2.5 * math.log(d2_squared/d1_squared)/math.log(10)
+    return 2.5*math.log(d2_squared/d1_squared)/math.log(10)
+
 def convertHMSToRad(HMSstr: str) -> np.float32:
-    HMSparts = HMSstr.split(" ")
-    return np.float32(HMSparts[0]) * math.pi / 12 \
-         + np.float32(HMSparts[1]) * math.pi / 12 / 60 \
-         + np.float32(HMSparts[2]) * math.pi / 12 / 60 / 60
+    H, M, S = HMSstr.split(" ")
+    return (np.float32(H) * math.pi / 12
+         + np.float32(M) * math.pi / (12*60)
+         + np.float32(S) * math.pi / (12*60*60))
 
 def convertDMSToRad(DMSstr: str) -> np.float32:
-    DMSparts = DMSstr.split(" ")
-    return np.float32(DMSparts[0]) * math.pi / 180 \
-         + np.float32(DMSparts[1]) * math.pi / 180 / 60 \
-         + np.float32(DMSparts[2]) * math.pi / 180 / 60 / 60
+    D, M, S = DMSstr.split(" ")
+    return (np.float32(D) * math.pi / 180
+         + np.float32(M) * math.pi / (180*60)
+         + np.float32(S) * math.pi / (180*60*60))
 
 def getExoplanetData():
     planets = []
@@ -98,16 +101,13 @@ def buildCartesianDatabase(spherical_database: npt.NDArray) -> npt.NDArray:
         entry['coordinates'] = spherical_to_cartesian(r, lat, lon)
     return star_database
 
-def shiftCartesianDatabase(cartesian_database: npt.NDArray, new_origin: npt.NDArray[np.float32]) -> npt.NDArray:
+def ShiftedCartesianDatabase(cartesian_database: npt.NDArray, new_origin: npt.NDArray[np.float32]) -> npt.NDArray:
     new_database = np.copy(cartesian_database)
     for entry in new_database:
-        x1,y1,z1 = entry['coordinates']
-        dist_sqr = x1*x1 + y1*y1 + z1*z1
-        x2,y2,z2 = entry['coordinates'] - new_origin
-        new_dist_sqr = x2*x2 + y2*y2 + z2*z2
-        entry['coordinates'] = np.array([x2,y2,z2], dtype=np.float64)
+        dist_sqr = np.sum(np.square(entry['coordinates']))
+        entry['coordinates'] = entry['coordinates'] - new_origin
+        new_dist_sqr = np.sum(np.square(entry['coordinates']))
         entry['magnitude'] += delta_star_magnitude(dist_sqr, new_dist_sqr)
-
     return new_database
 
 def filterStarDatabase(star_database: npt.NDArray, max_magnitude: np.float32):

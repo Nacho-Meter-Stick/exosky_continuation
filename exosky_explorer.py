@@ -1,12 +1,13 @@
 from astropy.coordinates import spherical_to_cartesian
 import pygame
-from random import randint
 import numpy as np
-from database import buildSphericalDatabase, buildCartesianDatabase, getExoplanetData, findPlanet, shiftCartesianDatabase
-from quaternions import normalized
-from sphere_to_2circles import sphere_to_circle, cartesian_STAR_MAP_to_circles
+from database import buildSphericalDatabase, buildCartesianDatabase, getExoplanetData, findPlanet, ShiftedCartesianDatabase
+from projection import cartesian_STAR_MAP_to_circles
 from dropdown import SearchableDropDown
 import math
+import numpy.typing as npt
+
+pygame.init()
 
 # COLORS
 ORANGE = (243, 146, 55)
@@ -16,250 +17,261 @@ PURPLE = (79, 81, 140)
 LIGHT_PURPLE = (144, 122, 214)
 LIGHT = (238, 227, 206)
 DIM = (75, 75, 75)
+BUTTON_COLOR = '#F39237'
+CONSTELLATION_COLOR = '#F39237'
 
-spectral_color_dict = dict(
-    O=(50, 21, 199),
-    B=(168, 183, 242),
-    A=(255, 255, 255),
-    F=(240, 240, 200),
-    G=(230, 230, 160),
-    K=(230, 100, 50),
-    M=(250, 30, 50),
-)
+SPECTRAL_COLOR_DICT = {
+    'O' : (50, 21, 199),
+    'B' : (168, 183, 242),
+    'A' : (255, 255, 255),
+    'F' : (240, 240, 200),
+    'G' : (230, 230, 160),
+    'K' : (230, 100, 50),
+    'M' : (250, 30, 50)
+}
 
-spherical_database = buildSphericalDatabase()
-star_database = buildCartesianDatabase(spherical_database)
-print(star_database[0])
+PLANETS = getExoplanetData()
+PLANET_NAMES = [planet['name'] for planet in PLANETS]
+STAR_DATABASE = buildCartesianDatabase(buildSphericalDatabase())
 
-sol_pos = np.array([0,0,0], dtype=np.float64)
-
-def generateSkySurface(width, height):
+def unit_vec(angle):
+    return np.array((math.cos(angle), math.sin(angle)))
+def int_vec(vec: npt.NDArray):
+    return np.array((int(vec[0]), int(vec[1])))
+def generateSkySurface(width, height, y_pos, cartesian_star_map):
     sky_surface = pygame.Surface((width, height))
 
-    projected_starmap = cartesian_STAR_MAP_to_circles(star_database)
+    projected_starmap = cartesian_STAR_MAP_to_circles(cartesian_star_map)
 
     color_grid = DIM
 
-    pos1 = (int(width/4), int(height/2))
-    pos2 = (int(3*width/4), int(height/2))
+    pos1 = (int(width/4), y_pos)
+    pos2 = (int(3*width/4), y_pos)
     radius = int(width/4)
 
-    pygame.draw.circle(sky_surface, color_grid, pos1, radius,1)
-    pygame.draw.circle(sky_surface, color_grid, pos2, radius,1)
+    pygame.draw.circle(sky_surface, color_grid, pos1, radius, 1)
+    pygame.draw.circle(sky_surface, color_grid, pos2, radius, 1)
     
-    ring = 1
-    while ring < 6:
+    for ring in range(1, 6):
         pygame.draw.circle(sky_surface, color_grid, pos1, int(radius * math.tan(math.pi/4 - ring*math.pi/12)), 1)
-        ring += 1
-    ring = 1
-    while ring < 6:
         pygame.draw.circle(sky_surface, color_grid, pos2, int(radius * math.tan(math.pi/4 - ring*math.pi/12)), 1)
-        ring += 1
     for i in range(12):
-        pygame.draw.line(sky_surface, color_grid, (pos1), 
-                         (int(radius * math.cos(2*math.pi/12 * i)) + pos1[0], 
-                          int(radius * math.sin(2*math.pi/12 * i)) + pos1[1]), 1)
-    for i in range(12):
-        pygame.draw.line(sky_surface, color_grid, (pos2), 
-                         (int(radius * math.cos(2*math.pi/12 * i)) + pos2[0], 
-                          int(radius * math.sin(2*math.pi/12 * i)) + pos2[1]), 1)
+        pygame.draw.line(sky_surface, color_grid, pos1, int_vec(radius*unit_vec(2*math.pi/12 * i) + np.array(pos1)), 1)
+        pygame.draw.line(sky_surface, color_grid, pos2, int_vec(radius*unit_vec(2*math.pi/12 * i) + np.array(pos2)), 1)
     
-    # Draw north
+    # Draw northern hemisphere
     for entry in projected_starmap[0]:
         if len(entry['spectra']) == 0: color = LIGHT
-        else: color = spectral_color_dict.get(entry['spectra'][0], LIGHT)
+        else: color = SPECTRAL_COLOR_DICT.get(entry['spectra'][0], LIGHT)
         if (entry['magnitude'] <= 10):
-            x,y,z = entry['coordinates']
             mag = int(6-entry['magnitude'])
+            x, y, _ = entry['coordinates']
 
-            x *= int(width/4)
-            y *= -int(width/4)
-            x += int(width/4)
-            y += int(height/2)
+            x = int(x*radius + pos1[0])
+            y = int(-y*radius + pos1[1])
 
-            x = int(x)
-            y = int(y)
-
-            coord = (x,y)
-
-            pygame.draw.circle(surface=sky_surface, color=color, center=coord, radius=mag, width=0)
+            pygame.draw.circle(surface=sky_surface, color=color, center=(x,y), radius=mag, width=0)
+    # Draw southern hemisphere
     for entry in projected_starmap[1]:
         if len(entry['spectra']) == 0: color = LIGHT
-        else: color = spectral_color_dict.get(entry['spectra'][0], LIGHT)
+        else: color = SPECTRAL_COLOR_DICT.get(entry['spectra'][0], LIGHT)
 
         if (entry['magnitude'] <= 10):
-            x,y,z = entry['coordinates']
             mag = int(6-entry['magnitude'])
+            x, y, _ = entry['coordinates']
 
-            x *= int(width/4)
-            y *= -int(width/4)
-            x += int(3*width/4)
-            y += int(height/2)
+            x = int(x*radius + pos2[0])
+            y = int(-y*radius + pos2[1])
 
-            x = int(x)
-            y = int(y)
-
-            coord = (x,y)
-            pygame.draw.circle(surface=sky_surface, color=color, center=coord, radius=mag, width=0)
+            pygame.draw.circle(surface=sky_surface, color=color, center=(x,y), radius=mag, width=0)
     return sky_surface
 
-white = (255, 255, 255)
-pygame.init()
-start_font = pygame.font.Font('./programFonts/Cascadia.ttf', 90)
-planet_font = pygame.font.Font('./programFonts/Cascadia.ttf', 40)
-title_text = start_font.render('Exosky Explorer!', False, '#907AD6')
-start_text = start_font.render('Start', False, '#EEE3CE')
-switch_text = planet_font.render('Switch Planets', False, '#2C2A4A')
-exit_text = planet_font.render('Exit', False, '#2C2A4A')
-save_text = planet_font.render('Save', False, '#2C2A4A')
-undo_text = planet_font.render('Undo', False, '#2C2A4A')
+window_surface = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+SIZE = pygame.display.get_window_size()
+BACKGROUND = pygame.Surface((SIZE[0], SIZE[1]), masks=pygame.Color('#161525'))
+sky_surface = generateSkySurface(SIZE[0], SIZE[1], SIZE[1]-SIZE[0]/4, STAR_DATABASE)
+
+BORDER_MARGIN = 10
+TEXT_MARGIN = 10
+BORDER_RADIUS = 3
+
+START_FONT = pygame.font.Font('./programFonts/Cascadia.ttf', 90)
+PLANET_FONT = pygame.font.Font('./programFonts/Cascadia.ttf', 40)
+switch_text = PLANET_FONT.render('Switch Planets', False, '#2C2A4A')
+
+##################################################################################################
+TITLE_TEXT = START_FONT.render('Exosky Explorer!', False, '#907AD6')
+
+TITLE_TEXT_WIDTH = TITLE_TEXT.get_width()
+TITLE_TEXT_HEIGHT = TITLE_TEXT.get_height()
+TITLE_TEXT_POS = (SIZE[0]/2-TITLE_TEXT_WIDTH/2, TEXT_MARGIN)
+##################################################################################################
+START_TEXT = START_FONT.render('Start', False, '#EEE3CE')
+
+START_TEXT_WIDTH = START_TEXT.get_width()
+START_TEXT_HEIGHT = START_TEXT.get_height()
+START_DIMENSIONS = (START_TEXT_WIDTH+2*TEXT_MARGIN, 
+                    START_TEXT_HEIGHT+2*TEXT_MARGIN)
+START_RECT = pygame.Rect(SIZE[0]/2 - START_DIMENSIONS[0]/2, 
+                         SIZE[1] - START_DIMENSIONS[1]-BORDER_MARGIN, 
+                         START_DIMENSIONS[0], START_DIMENSIONS[1])
+START_TEXT_POS = (SIZE[0]/2 - START_TEXT_WIDTH/2, 
+                  SIZE[1] - START_DIMENSIONS[1] - BORDER_MARGIN + TEXT_MARGIN)
+##################################################################################################
+EXIT_TEXT = PLANET_FONT.render('Exit', False, '#2C2A4A')
+
+EXIT_DIMENSIONS = (EXIT_TEXT.get_width()+2*TEXT_MARGIN, 
+                    EXIT_TEXT.get_height()+2*TEXT_MARGIN)
+EXIT_RECT = pygame.Rect(BORDER_MARGIN*3, 
+                        SIZE[1] - EXIT_DIMENSIONS[1] - BORDER_MARGIN, 
+                        EXIT_DIMENSIONS[0], EXIT_DIMENSIONS[1])
+
+EXIT_TEXT_POS = (BORDER_MARGIN*3+TEXT_MARGIN, 
+                 SIZE[1] - EXIT_DIMENSIONS[1] - BORDER_MARGIN + TEXT_MARGIN)
+##################################################################################################
+SAVE_TEXT = PLANET_FONT.render('Save', False, '#2C2A4A')
+
+SAVE_DIMENSIONS = (SAVE_TEXT.get_width()+2*TEXT_MARGIN, 
+                    SAVE_TEXT.get_height()+2*TEXT_MARGIN)
+SAVE_RECT = pygame.Rect(SIZE[0] - SAVE_DIMENSIONS[0] - BORDER_MARGIN*3, 
+                        SIZE[1] - SAVE_DIMENSIONS[1] - BORDER_MARGIN, 
+                        SAVE_DIMENSIONS[0], SAVE_DIMENSIONS[1])
+SAVE_TEXT_POS = (SIZE[0] - SAVE_DIMENSIONS[0] - BORDER_MARGIN*3+TEXT_MARGIN,  
+                 SIZE[1] - SAVE_DIMENSIONS[1] - BORDER_MARGIN + TEXT_MARGIN)
+##################################################################################################
+START_CHARTING_TEXT = PLANET_FONT.render('Start Charting', False, '#2C2A4A')
+START_CHARTING_DIMENSIONS = (START_CHARTING_TEXT.get_width()+2*TEXT_MARGIN, 
+                             START_CHARTING_TEXT.get_height()+2*TEXT_MARGIN)
+START_CHARTING_RECT = pygame.Rect(BORDER_MARGIN*3, BORDER_MARGIN, 
+                                 START_CHARTING_DIMENSIONS[0], 
+                                 START_CHARTING_DIMENSIONS[1])
+START_CHARTING_TEXT_POS = (BORDER_MARGIN*3+TEXT_MARGIN, 
+                           BORDER_MARGIN+TEXT_MARGIN)
+##################################################################################################
+END_CHARTING_TEXT = PLANET_FONT.render('End Charting', False, '#2C2A4A')
+END_CHARTING_DIMENSIONS = (END_CHARTING_TEXT.get_width()+2*TEXT_MARGIN, 
+                             END_CHARTING_TEXT.get_height()+2*TEXT_MARGIN)
+END_CHARTING_RECT = pygame.Rect(BORDER_MARGIN*3, BORDER_MARGIN, 
+                                END_CHARTING_DIMENSIONS[0], 
+                                END_CHARTING_DIMENSIONS[1])
+END_CHARTING_TEXT_POS = (BORDER_MARGIN*3+TEXT_MARGIN, 
+                         BORDER_MARGIN+TEXT_MARGIN)
+##################################################################################################
+UNDO_TEXT = PLANET_FONT.render('Undo', False, '#2C2A4A')
+
+UNDO_DIMENSIONS = (UNDO_TEXT.get_width()+2*TEXT_MARGIN, 
+                    UNDO_TEXT.get_height()+2*TEXT_MARGIN)
+UNDO_RECT = pygame.Rect(BORDER_MARGIN*3, 
+                        END_CHARTING_DIMENSIONS[1]+2*BORDER_MARGIN, 
+                        UNDO_DIMENSIONS[0], UNDO_DIMENSIONS[1])
+UNDO_TEXT_POS = (BORDER_MARGIN*3+TEXT_MARGIN, 
+                 END_CHARTING_DIMENSIONS[1]+2*BORDER_MARGIN+TEXT_MARGIN)
+##################################################################################################
 pygame.display.set_caption('Exosky!')
-
-window_surface = pygame.display.set_mode((0, 0), pygame.FULLSCREEN) #or pygame.FULLSCREEN to have the window stay fullscreen (no bar at top) Two numbers indicate minimized size
-size = pygame.display.get_window_size()
-background = pygame.Surface((size[0], size[1]))
-sky_surface = generateSkySurface(size[0], size[1])
-background.fill(pygame.Color('#161525'))
-
-pos = (-1, -1)
-mapping = False
-start = False
+user_be_drawing = False
 saving = False
-check = True
-planet_str = "Earth"
-constellation_str = 'Start Charting'
-arr = []
-temp_len = 0
-border_margin = 10
-text_margin = 10
-radii = 3
 
-planets = getExoplanetData()
-planetNames = []
-for planet in planets:
-    planetNames.append(planet['name'])
-
-dimensions = (355, 60)
+EXOPLANETSELECTOR_DIMENSIONS = (355, 60)
 exoPlanetSelector = SearchableDropDown(
     [ORANGE, PURPLE],
     [PURPLE, LIGHT_PURPLE],
     DARK,
     ORANGE,
-    size[0]-dimensions[0]-border_margin*3, border_margin, dimensions[0], dimensions[1],
-    planetNames,
-    size)
-
-
-
+    SIZE[0]-EXOPLANETSELECTOR_DIMENSIONS[0]-BORDER_MARGIN*3, 
+    BORDER_MARGIN, 
+    EXOPLANETSELECTOR_DIMENSIONS[0], 
+    EXOPLANETSELECTOR_DIMENSIONS[1],
+    PLANET_NAMES,
+    SIZE
+)
+planetName = exoPlanetSelector.getChosen()
+constellations = {planetName: [[]]}
+################################### Loop on start screen #####################################
 while True:
-    window_surface.blit(background, (0, 0))
-    window_surface.blit(sky_surface, (0,0))
+    window_surface.blit(BACKGROUND, (0, 0))
+    window_surface.blit(sky_surface, (0, 0))
+    window_surface.blit(TITLE_TEXT, TITLE_TEXT_POS)
+    event_list = pygame.event.get()
+    start = False
+    for event in event_list:
+        if event.type == pygame.MOUSEBUTTONDOWN and START_RECT.collidepoint(event.pos):
+            start = True
+            break
+    if start: break
+    # START BUTTON
+    start_button = pygame.draw.rect(window_surface, BUTTON_COLOR, START_RECT,  0, BORDER_RADIUS)
+    window_surface.blit(START_TEXT, START_TEXT_POS)
 
-    # planet_text = planet_font.render(planet_str, False, '#F39237')
-    constellation_text = planet_font.render(constellation_str, False, '#2C2A4A')
+    pygame.display.update()
+###################################  USER HAS DECIDED TO START THE GAME  #####################################
+def undo(constellations_planetName):
+    if (constellations_planetName): 
+        if len(constellations_planetName[-1]) == 0: 
+            constellations_planetName.pop()
+            undo(constellations_planetName)
+        elif len(constellations_planetName) > 1: 
+            constellations_planetName[-1].pop()
+while True:
+    ###################################  PROCESS EVENTS  #####################################
     event_list = pygame.event.get()
     for event in event_list:
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if(mapping):
-                check = True
-                if(pos[0] != -1):
-                    arr.append(pos[0]);arr.append(pos[1]);arr.append(pygame.mouse.get_pos()[0]);arr.append(pygame.mouse.get_pos()[1])
-                else:
-                    check = False
-            pos = pygame.mouse.get_pos()
+        if event.type != pygame.MOUSEBUTTONDOWN: continue
+        pos = event.pos
+        if EXIT_RECT.collidepoint(pos): exit()
+        elif SAVE_RECT.collidepoint(pos): saving = True
+        elif user_be_drawing:
+            if END_CHARTING_RECT.collidepoint(pos): user_be_drawing = False
+            elif UNDO_RECT.collidepoint(pos):
+                undo(constellations[planetName])
+            elif exoPlanetSelector.pos_is_not_on_menu(pos): constellations[planetName][-1].append(pos)
+        elif START_CHARTING_RECT.collidepoint(pos):
+            user_be_drawing = True
+            constellations[planetName].append([])
 
-    text_width = title_text.get_width()
-    text_height = title_text.get_height()
-    window_surface.blit(title_text, (size[0]/2-text_width/2, text_margin))
-    if not(start):
+    demand_to_change_planet = exoPlanetSelector.update(event_list)
+    if demand_to_change_planet:
+        constellations[planetName].append([])
+        planetName = exoPlanetSelector.getChosen()
+        planet = findPlanet(PLANETS, planetName)
+        if planetName not in arr: constellations[planetName] = [[]]
+        offset_vec = np.array(spherical_to_cartesian(planet['distance'], 
+                                                     planet['declination'], 
+                                                     planet['rightascension']), dtype=np.float64)
+        sky_surface = generateSkySurface(SIZE[0], SIZE[1], SIZE[1]-SIZE[0]/4, ShiftedCartesianDatabase(STAR_DATABASE, offset_vec))
         
-        text_width = start_text.get_width()
-        text_height = start_text.get_height()
-        dimensions = (text_width+2*text_margin, text_height+2*text_margin)
-        start_button = pygame.draw.rect(window_surface,'#F39237', pygame.Rect(size[0]/2 - dimensions[0]/2, size[1] - dimensions[1]-border_margin, dimensions[0], dimensions[1]),  0, radii)
-        window_surface.blit(start_text, (size[0]/2 - text_width/2,  size[1] - dimensions[1] - border_margin + text_margin))
-        if start_button.collidepoint(pos):
-            start = True
+
+    #############################  Add main view before saving  ##########################
+    window_surface.blit(BACKGROUND, (0, 0))
+    window_surface.blit(sky_surface, (0, 0))
+    for chain in constellations[planetName]:
+        for i in range(len(chain)-1):
+            pygame.draw.line(window_surface, CONSTELLATION_COLOR, chain[i], chain[i+1], 3)
+    ##################  Save screen before reloading buttons if needed  ##################
+    if saving: # In this case, we actually want the planet name up a bit higher
+        exoPlanetSelector.draw_planetName_on(window_surface, y=TEXT_MARGIN)
+        pygame.image.save(window_surface, "image.png")
+        saving = False
     else:
-        #text_rect = planet_text.get_rect(center=(size[0]/2, 120))
-        #window_surface.blit(planet_text, text_rect)
-        if not(saving):
-            exoPlanetSelector.draw(window_surface)
-            
-            text_width = constellation_text.get_width()
-            text_height = constellation_text.get_height()
-            dimensions = (text_width+2*text_margin, text_height+2*text_margin)
-            constellation_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(border_margin*3, border_margin, dimensions[0], dimensions[1]), 0, radii)
-            window_surface.blit(constellation_text, (border_margin*3+text_margin, border_margin+text_margin))
-            
-            text_width = exit_text.get_width()
-            text_height = exit_text.get_height()
-            dimensions = (text_width+2*text_margin, text_height+2*text_margin)
-            exit_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(border_margin*3, size[1] - dimensions[1] - border_margin, dimensions[0], dimensions[1]), 0, radii)
-            window_surface.blit(exit_text, (border_margin*3+text_margin, size[1] - dimensions[1]-border_margin + text_margin))
-            
-            text_width = save_text.get_width()
-            text_height = save_text.get_height()
-            dimensions = (text_width+2*text_margin, text_height+2*text_margin)
-            save_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(size[0] - dimensions[0] - border_margin*3, size[1] - dimensions[1]-border_margin, dimensions[0], dimensions[1]),  0, radii)
-            window_surface.blit(save_text, (size[0] - dimensions[0] - border_margin*3+text_margin,  size[1] - dimensions[1]-border_margin + text_margin))
+        exoPlanetSelector.draw_planetName_on(window_surface)
+    ##############  Reload title, buttons, dropdown menu, and constellations  #############
+    window_surface.blit(TITLE_TEXT, TITLE_TEXT_POS)
+    exoPlanetSelector.draw_dropdown_on(window_surface)
+    # EXIT BUTTON
+    pygame.draw.rect(window_surface, BUTTON_COLOR, EXIT_RECT, 0, BORDER_RADIUS)
+    window_surface.blit(EXIT_TEXT, EXIT_TEXT_POS)
+    # SAVE BUTTON
+    pygame.draw.rect(window_surface, BUTTON_COLOR, SAVE_RECT,  0, BORDER_RADIUS)
+    window_surface.blit(SAVE_TEXT, SAVE_TEXT_POS)
 
-        changed = exoPlanetSelector.update(event_list)
-        if changed:
-            planet = findPlanet(planets, exoPlanetSelector.getChosen())
-            right_ascension = planet['rightascension']
-            declination = planet['declination']
-            distance = planet['distance']
-            offset_vec = np.array(spherical_to_cartesian(distance, declination, right_ascension), dtype=np.float64)
-            star_database = shiftCartesianDatabase(star_database, np.add(offset_vec,sol_pos))
-            sol_pos = -offset_vec
-
-            sky_surface = generateSkySurface(size[0], size[1])
-
-        if constellation_button.collidepoint(pos):
-            if constellation_str == 'Start Charting':
-                constellation_str = 'End Charting'
-                mapping = True
-                temp_len = len(arr)
-            else:
-                constellation_str = 'Start Charting'
-                mapping = False
-                if temp_len != len(arr) and check:
-                    arr.pop();arr.pop();arr.pop();arr.pop();
-            pos = (-1, -1)
-        if mapping:
-            text_width = undo_text.get_width()
-            text_height = undo_text.get_height()
-            dimensions = (text_width+2*text_margin, text_height+2*text_margin)
-            text_width = constellation_text.get_width()
-            text_height = constellation_text.get_height()
-            dimensions2 = (text_width+2*text_margin, text_height+2*text_margin)
-            undo_button = pygame.draw.rect(window_surface, '#F39237', pygame.Rect(border_margin*3, dimensions2[1]+2*border_margin, dimensions[0], dimensions[1]), 0, radii)
-            window_surface.blit(undo_text, (border_margin*3+text_margin, dimensions2[1]+2*border_margin+text_margin))
-            
-            if undo_button.collidepoint(pos) and len(arr) >= 4:
-                if check:
-                    arr.pop();arr.pop();arr.pop();arr.pop();
-                if(len(arr) >= 4):
-                   pos = (arr[len(arr)-4], arr[len(arr)-3])
-                   arr.pop();arr.pop();arr.pop();arr.pop()
-                   if len(arr) == 0:
-                       pos = (-1, -1)
-                else:
-                    pos = (-1, -1)
-                check = False
-            elif undo_button.collidepoint(pos):
-                pos = (-1, -1)
-        if exit_button.collidepoint(pos):
-            exit()
-        j = 0;
-        for i in range(int(len(arr)/4)):
-            pygame.draw.line(window_surface, '#F39237', (arr[j], arr[j+1]), (arr[j+2], arr[j+3]), 3)
-            j+=4
-        if saving:
-            pygame.image.save(window_surface, "image.png")
-            saving = False
-        if save_button.collidepoint(pos):
-            saving = True
-            pos = (-1, -1)
+    if not user_be_drawing:
+        # START CHARTING BUTTON
+        pygame.draw.rect(window_surface, BUTTON_COLOR, START_CHARTING_RECT, 0, BORDER_RADIUS)
+        window_surface.blit(START_CHARTING_TEXT, START_CHARTING_TEXT_POS)
+    if user_be_drawing:
+        # END CHARTING BUTTON
+        pygame.draw.rect(window_surface, BUTTON_COLOR, END_CHARTING_RECT, 0, BORDER_RADIUS)
+        window_surface.blit(END_CHARTING_TEXT, END_CHARTING_TEXT_POS)
+        # UNDO BUTTON
+        pygame.draw.rect(window_surface, BUTTON_COLOR, UNDO_RECT, 0, BORDER_RADIUS)
+        window_surface.blit(UNDO_TEXT, UNDO_TEXT_POS)
     pygame.display.update()
