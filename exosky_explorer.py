@@ -187,6 +187,17 @@ pygame.display.set_caption('Exosky!')
 user_be_drawing = False
 saving = False
 
+def undo(constellations, planetName):
+    if constellations[planetName]: 
+        if len(constellations[planetName][-1]) == 0: 
+            constellations[planetName].pop()
+        elif len(constellations[planetName]) > 1: 
+            constellations[planetName][-1].pop()
+def draw_constellations(constellations, planetName, surface):
+    for chain in constellations[planetName]:
+        for i in range(len(chain)-1):
+            pygame.draw.line(surface, CONSTELLATION_COLOR, chain[i], chain[i+1], 3)
+
 EXOPLANETSELECTOR_DIMENSIONS = (355, 60)
 exoPlanetSelector = SearchableDropDown(
     [ORANGE, PURPLE],
@@ -212,10 +223,7 @@ So really, constellations is a dict of these 2d lists.
 Yes, there are many planets, and this could become a memory problem. 
 But the amount of time you would have to spend waiting for the 'switch planet' function to work would be literally insane.
 '''
-def draw_constellations(constellations, planetName, surface):
-    for chain in constellations[planetName]:
-        for i in range(len(chain)-1):
-            pygame.draw.line(surface, CONSTELLATION_COLOR, chain[i], chain[i+1], 3)
+
 constellations = {planetName: [[]]}
 ################################### Loop on start screen #####################################
 while True:
@@ -232,13 +240,6 @@ while True:
     START_BUTTON.draw_on(window_surface)
     pygame.display.update()
 ###################################  USER HAS DECIDED TO START THE GAME  #####################################
-def undo(constellations_planetName):
-    if (constellations_planetName): 
-        if len(constellations_planetName[-1]) == 0: 
-            constellations_planetName.pop()
-            undo(constellations_planetName)
-        elif len(constellations_planetName) > 1: 
-            constellations_planetName[-1].pop()
 while True:
     ###################################  PROCESS EVENTS  #####################################
     event_list = pygame.event.get()
@@ -249,7 +250,7 @@ while True:
         elif SAVE_BUTTON.collidepoint(pos): saving = True
         elif user_be_drawing:
             if END_CHARTING_BUTTON.collidepoint(pos): user_be_drawing = False
-            elif UNDO_BUTTON.collidepoint(pos): undo(constellations[planetName])
+            elif UNDO_BUTTON.collidepoint(pos): undo(constellations, planetName)
             elif exoPlanetSelector.pos_is_not_on_menu(pos): constellations[planetName][-1].append(pos)
         elif START_CHARTING_BUTTON.collidepoint(pos):
             user_be_drawing = True
