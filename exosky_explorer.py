@@ -242,7 +242,8 @@ while True:
                                                      planet['declination'], 
                                                      planet['rightascension']), dtype=np.float64)
         # Turns out, the shiftCartesianDatabase() function was creating a deepcopy every time anyways.
-        # And besides, we really do not want to try to do that weird relativity thing if we ever do rotations.
+        # Besides that relativity stuff is difficult to think about. Makes the code more obscure and difficult to debug.
+        # It would would get even worse if we start doing rotations.
         sky_surface = generateSkySurface(SIZE[0], SIZE[1], SIZE[1]-SIZE[0]/4, ShiftedCartesianDatabase(STAR_DATABASE, offset_vec))
     #############################  Add main view before saving  ##########################
     window_surface.blit(BACKGROUND, (0, 0))
