@@ -107,10 +107,10 @@ TITLE_TEXT_HEIGHT = TITLE_TEXT.get_height()
 TITLE_TEXT_POS = (SIZE[0]/2-TITLE_TEXT_WIDTH/2, TEXT_MARGIN)
 ##################################################################################################
 class Button():
-    def __init__(self, TEXT, RECT_POS, DIMENSIONS):
-        self.rect = pygame.Rect(RECT_POS[0], RECT_POS[1], DIMENSIONS[0], DIMENSIONS[1])
+    def __init__(self, TEXT, RECT_POS):
+        self.dims = (TEXT.get_width() + 2*TEXT_MARGIN, TEXT.get_width() + 2*TEXT_MARGIN)
+        self.rect = pygame.Rect(RECT_POS[0], RECT_POS[1], self.dims[0], self.dims[1])
         self.rect_pos = RECT_POS
-        self.dims = DIMENSIONS
         self.text = TEXT
         self.text_pos = (RECT_POS[0] + TEXT_MARGIN, RECT_POS[1] + TEXT_MARGIN)
     def draw_on(self, surf):
@@ -124,64 +124,40 @@ START_DIMENSIONS = (START_TEXT.get_width() + 2*TEXT_MARGIN,
                     START_TEXT.get_height() + 2*TEXT_MARGIN)
 START_RECT_POS = (SIZE[0]/2 - START_DIMENSIONS[0]/2, 
                   SIZE[1] - START_DIMENSIONS[1] - BORDER_MARGIN)
-START_BUTTON = Button(
-    START_TEXT,
-    START_RECT_POS,
-    START_DIMENSIONS
-)
+START_BUTTON = Button(START_TEXT, START_RECT_POS)
 ##################################################################################################
 EXIT_TEXT = PLANET_FONT.render('Exit', False, '#2C2A4A')
 EXIT_DIMENSIONS = (EXIT_TEXT.get_width()+2*TEXT_MARGIN, 
                     EXIT_TEXT.get_height()+2*TEXT_MARGIN)
 EXIT_RECT_POS = (BORDER_MARGIN*3, 
                  SIZE[1] - EXIT_DIMENSIONS[1] - BORDER_MARGIN)
-EXIT_BUTTON = Button(
-    EXIT_TEXT,
-    EXIT_RECT_POS,
-    EXIT_DIMENSIONS
-)
+EXIT_BUTTON = Button(EXIT_TEXT, EXIT_RECT_POS)
 ##################################################################################################
 SAVE_TEXT = PLANET_FONT.render('Save', False, '#2C2A4A')
 SAVE_DIMENSIONS = (SAVE_TEXT.get_width()+2*TEXT_MARGIN, 
                     SAVE_TEXT.get_height()+2*TEXT_MARGIN)
 SAVE_RECT_POS = (SIZE[0] - SAVE_DIMENSIONS[0] - BORDER_MARGIN*3, 
                  SIZE[1] - SAVE_DIMENSIONS[1] - BORDER_MARGIN)
-SAVE_BUTTON = Button(
-    SAVE_TEXT,
-    SAVE_RECT_POS,
-    SAVE_DIMENSIONS
-)
+SAVE_BUTTON = Button(SAVE_TEXT, SAVE_RECT_POS)
 ##################################################################################################
 START_CHARTING_TEXT = PLANET_FONT.render('Start Charting', False, '#2C2A4A')
 START_CHARTING_DIMENSIONS = (START_CHARTING_TEXT.get_width()+2*TEXT_MARGIN, 
                              START_CHARTING_TEXT.get_height()+2*TEXT_MARGIN)
 START_CHARTING_RECT_POS = (BORDER_MARGIN*3, BORDER_MARGIN)
-START_CHARTING_BUTTON = Button(
-    START_CHARTING_TEXT,
-    START_CHARTING_RECT_POS,
-    START_CHARTING_DIMENSIONS
-)
+START_CHARTING_BUTTON = Button(START_CHARTING_TEXT, START_CHARTING_RECT_POS)
 ##################################################################################################
 END_CHARTING_TEXT = PLANET_FONT.render('End Charting', False, '#2C2A4A')
 END_CHARTING_DIMENSIONS = (END_CHARTING_TEXT.get_width()+2*TEXT_MARGIN, 
                              END_CHARTING_TEXT.get_height()+2*TEXT_MARGIN)
 END_CHARTING_RECT_POS = (BORDER_MARGIN*3, BORDER_MARGIN)
-END_CHARTING_BUTTON = Button(
-    END_CHARTING_TEXT,
-    END_CHARTING_RECT_POS,
-    END_CHARTING_DIMENSIONS
-)
+END_CHARTING_BUTTON = Button(END_CHARTING_TEXT, END_CHARTING_RECT_POS)
 ##################################################################################################
 UNDO_TEXT = PLANET_FONT.render('Undo', False, '#2C2A4A')
 UNDO_DIMENSIONS = (UNDO_TEXT.get_width()+2*TEXT_MARGIN, 
                     UNDO_TEXT.get_height()+2*TEXT_MARGIN)
 UNDO_RECT_POS = (BORDER_MARGIN*3, 
                  END_CHARTING_DIMENSIONS[1]+2*BORDER_MARGIN)
-UNDO_BUTTON = Button(
-    UNDO_TEXT,
-    UNDO_RECT_POS,
-    UNDO_DIMENSIONS
-)
+UNDO_BUTTON = Button(UNDO_TEXT, UNDO_RECT_POS)
 ##################################################################################################
 pygame.display.set_caption('Exosky!')
 user_be_drawing = False
