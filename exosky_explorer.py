@@ -185,6 +185,17 @@ exoPlanetSelector = SearchableDropDown(
     SIZE
 )
 planetName = exoPlanetSelector.getChosen()
+'''
+Heres how constellations are going to work.
+Its going to be a list of lists of tuples. The tuples are pixel coordinates.
+Each row is going to be a chain. So anytime you 'pick the pen up and put it back down',
+you end the last row and append a new empty row.
+
+Not only that, but every planet is going to have its own unique list of lists. 
+So really, constellations is a dict of these 2d lists.
+Yes, there are many planets, and this could become a memory problem. 
+But the amount of time you would have to spend waiting for the 'switch planet' function to work would be literally insane.
+'''
 constellations = {planetName: [[]]}
 ################################### Loop on start screen #####################################
 while True:
@@ -221,8 +232,7 @@ while True:
         elif SAVE_RECT.collidepoint(pos): saving = True
         elif user_be_drawing:
             if END_CHARTING_RECT.collidepoint(pos): user_be_drawing = False
-            elif UNDO_RECT.collidepoint(pos):
-                undo(constellations[planetName])
+            elif UNDO_RECT.collidepoint(pos): undo(constellations[planetName])
             elif exoPlanetSelector.pos_is_not_on_menu(pos): constellations[planetName][-1].append(pos)
         elif START_CHARTING_RECT.collidepoint(pos):
             user_be_drawing = True
@@ -237,6 +247,8 @@ while True:
         offset_vec = np.array(spherical_to_cartesian(planet['distance'], 
                                                      planet['declination'], 
                                                      planet['rightascension']), dtype=np.float64)
+        # Turns out, the shiftCartesianDatabase() function was creating a deepcopy every time anyways.
+        # and besides, we don't want to try to do that weird relativity thing if we ever do rotations.
         sky_surface = generateSkySurface(SIZE[0], SIZE[1], SIZE[1]-SIZE[0]/4, ShiftedCartesianDatabase(STAR_DATABASE, offset_vec))
         
 
