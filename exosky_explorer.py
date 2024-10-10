@@ -200,7 +200,7 @@ Yes, there are many planets, and this could become a memory problem.
 But the amount of time you would have to spend waiting for the 'switch planet' function to work would be literally insane.
 '''
 
-constellations = {planetName: [[]]}
+constellations: dict[str, list[list[tuple[int, int]]]] = {planetName: [[]]}
 ################################### Loop on start screen #####################################
 while True:
     window_surface.blit(BACKGROUND, (0, 0))
