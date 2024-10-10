@@ -106,66 +106,82 @@ TITLE_TEXT_WIDTH = TITLE_TEXT.get_width()
 TITLE_TEXT_HEIGHT = TITLE_TEXT.get_height()
 TITLE_TEXT_POS = (SIZE[0]/2-TITLE_TEXT_WIDTH/2, TEXT_MARGIN)
 ##################################################################################################
+class Button():
+    def __init__(self, TEXT, RECT_POS, DIMENSIONS):
+        self.rect = pygame.Rect(RECT_POS[0], RECT_POS[1], DIMENSIONS[0], DIMENSIONS[1])
+        self.rect_pos = RECT_POS
+        self.dims = DIMENSIONS
+        self.text = TEXT
+        self.text_pos = (RECT_POS[0] + TEXT_MARGIN, RECT_POS[1] + TEXT_MARGIN)
+    def draw_on(self, surf):
+        pygame.draw.rect(surf, BUTTON_COLOR, self.rect, 0, BORDER_RADIUS)
+        window_surface.blit(self.text, self.text_pos)
+    def collidepoint(self, pos):
+        return self.rect.collidepoint(pos)
+##################################################################################################
 START_TEXT = START_FONT.render('Start', False, '#EEE3CE')
-
-START_TEXT_WIDTH = START_TEXT.get_width()
-START_TEXT_HEIGHT = START_TEXT.get_height()
-START_DIMENSIONS = (START_TEXT_WIDTH+2*TEXT_MARGIN, 
-                    START_TEXT_HEIGHT+2*TEXT_MARGIN)
-START_RECT = pygame.Rect(SIZE[0]/2 - START_DIMENSIONS[0]/2, 
-                         SIZE[1] - START_DIMENSIONS[1]-BORDER_MARGIN, 
-                         START_DIMENSIONS[0], START_DIMENSIONS[1])
-START_TEXT_POS = (SIZE[0]/2 - START_TEXT_WIDTH/2, 
-                  SIZE[1] - START_DIMENSIONS[1] - BORDER_MARGIN + TEXT_MARGIN)
+START_DIMENSIONS = (START_TEXT.get_width() + 2*TEXT_MARGIN, 
+                    START_TEXT.get_height() + 2*TEXT_MARGIN)
+START_RECT_POS = (SIZE[0]/2 - START_DIMENSIONS[0]/2, 
+                  SIZE[1] - START_DIMENSIONS[1] - BORDER_MARGIN)
+START_BUTTON = Button(
+    START_TEXT,
+    START_RECT_POS,
+    START_DIMENSIONS
+)
 ##################################################################################################
 EXIT_TEXT = PLANET_FONT.render('Exit', False, '#2C2A4A')
-
 EXIT_DIMENSIONS = (EXIT_TEXT.get_width()+2*TEXT_MARGIN, 
                     EXIT_TEXT.get_height()+2*TEXT_MARGIN)
-EXIT_RECT = pygame.Rect(BORDER_MARGIN*3, 
-                        SIZE[1] - EXIT_DIMENSIONS[1] - BORDER_MARGIN, 
-                        EXIT_DIMENSIONS[0], EXIT_DIMENSIONS[1])
-
-EXIT_TEXT_POS = (BORDER_MARGIN*3+TEXT_MARGIN, 
-                 SIZE[1] - EXIT_DIMENSIONS[1] - BORDER_MARGIN + TEXT_MARGIN)
+EXIT_RECT_POS = (BORDER_MARGIN*3, 
+                 SIZE[1] - EXIT_DIMENSIONS[1] - BORDER_MARGIN)
+EXIT_BUTTON = Button(
+    EXIT_TEXT,
+    EXIT_RECT_POS,
+    EXIT_DIMENSIONS
+)
 ##################################################################################################
 SAVE_TEXT = PLANET_FONT.render('Save', False, '#2C2A4A')
-
 SAVE_DIMENSIONS = (SAVE_TEXT.get_width()+2*TEXT_MARGIN, 
                     SAVE_TEXT.get_height()+2*TEXT_MARGIN)
-SAVE_RECT = pygame.Rect(SIZE[0] - SAVE_DIMENSIONS[0] - BORDER_MARGIN*3, 
-                        SIZE[1] - SAVE_DIMENSIONS[1] - BORDER_MARGIN, 
-                        SAVE_DIMENSIONS[0], SAVE_DIMENSIONS[1])
-SAVE_TEXT_POS = (SIZE[0] - SAVE_DIMENSIONS[0] - BORDER_MARGIN*3+TEXT_MARGIN,  
-                 SIZE[1] - SAVE_DIMENSIONS[1] - BORDER_MARGIN + TEXT_MARGIN)
+SAVE_RECT_POS = (SIZE[0] - SAVE_DIMENSIONS[0] - BORDER_MARGIN*3, 
+                 SIZE[1] - SAVE_DIMENSIONS[1] - BORDER_MARGIN)
+SAVE_BUTTON = Button(
+    SAVE_TEXT,
+    SAVE_RECT_POS,
+    SAVE_DIMENSIONS
+)
 ##################################################################################################
 START_CHARTING_TEXT = PLANET_FONT.render('Start Charting', False, '#2C2A4A')
 START_CHARTING_DIMENSIONS = (START_CHARTING_TEXT.get_width()+2*TEXT_MARGIN, 
                              START_CHARTING_TEXT.get_height()+2*TEXT_MARGIN)
-START_CHARTING_RECT = pygame.Rect(BORDER_MARGIN*3, BORDER_MARGIN, 
-                                 START_CHARTING_DIMENSIONS[0], 
-                                 START_CHARTING_DIMENSIONS[1])
-START_CHARTING_TEXT_POS = (BORDER_MARGIN*3+TEXT_MARGIN, 
-                           BORDER_MARGIN+TEXT_MARGIN)
+START_CHARTING_RECT_POS = (BORDER_MARGIN*3, BORDER_MARGIN)
+START_CHARTING_BUTTON = Button(
+    START_CHARTING_TEXT,
+    START_CHARTING_RECT_POS,
+    START_CHARTING_DIMENSIONS
+)
 ##################################################################################################
 END_CHARTING_TEXT = PLANET_FONT.render('End Charting', False, '#2C2A4A')
 END_CHARTING_DIMENSIONS = (END_CHARTING_TEXT.get_width()+2*TEXT_MARGIN, 
                              END_CHARTING_TEXT.get_height()+2*TEXT_MARGIN)
-END_CHARTING_RECT = pygame.Rect(BORDER_MARGIN*3, BORDER_MARGIN, 
-                                END_CHARTING_DIMENSIONS[0], 
-                                END_CHARTING_DIMENSIONS[1])
-END_CHARTING_TEXT_POS = (BORDER_MARGIN*3+TEXT_MARGIN, 
-                         BORDER_MARGIN+TEXT_MARGIN)
+END_CHARTING_RECT_POS = (BORDER_MARGIN*3, BORDER_MARGIN)
+END_CHARTING_BUTTON = Button(
+    END_CHARTING_TEXT,
+    END_CHARTING_RECT_POS,
+    END_CHARTING_DIMENSIONS
+)
 ##################################################################################################
 UNDO_TEXT = PLANET_FONT.render('Undo', False, '#2C2A4A')
-
 UNDO_DIMENSIONS = (UNDO_TEXT.get_width()+2*TEXT_MARGIN, 
                     UNDO_TEXT.get_height()+2*TEXT_MARGIN)
-UNDO_RECT = pygame.Rect(BORDER_MARGIN*3, 
-                        END_CHARTING_DIMENSIONS[1]+2*BORDER_MARGIN, 
-                        UNDO_DIMENSIONS[0], UNDO_DIMENSIONS[1])
-UNDO_TEXT_POS = (BORDER_MARGIN*3+TEXT_MARGIN, 
-                 END_CHARTING_DIMENSIONS[1]+2*BORDER_MARGIN+TEXT_MARGIN)
+UNDO_RECT_POS = (BORDER_MARGIN*3, 
+                 END_CHARTING_DIMENSIONS[1]+2*BORDER_MARGIN)
+UNDO_BUTTON = Button(
+    UNDO_TEXT,
+    UNDO_RECT_POS,
+    UNDO_DIMENSIONS
+)
 ##################################################################################################
 pygame.display.set_caption('Exosky!')
 user_be_drawing = False
@@ -196,6 +212,10 @@ So really, constellations is a dict of these 2d lists.
 Yes, there are many planets, and this could become a memory problem. 
 But the amount of time you would have to spend waiting for the 'switch planet' function to work would be literally insane.
 '''
+def draw_constellations(constellations, planetName, surface):
+    for chain in constellations[planetName]:
+        for i in range(len(chain)-1):
+            pygame.draw.line(surface, CONSTELLATION_COLOR, chain[i], chain[i+1], 3)
 constellations = {planetName: [[]]}
 ################################### Loop on start screen #####################################
 while True:
@@ -205,14 +225,11 @@ while True:
     event_list = pygame.event.get()
     start = False
     for event in event_list:
-        if event.type == pygame.MOUSEBUTTONDOWN and START_RECT.collidepoint(event.pos):
+        if event.type == pygame.MOUSEBUTTONDOWN and START_BUTTON.collidepoint(event.pos):
             start = True
             break
     if start: break
-    # START BUTTON
-    start_button = pygame.draw.rect(window_surface, BUTTON_COLOR, START_RECT,  0, BORDER_RADIUS)
-    window_surface.blit(START_TEXT, START_TEXT_POS)
-
+    START_BUTTON.draw_on(window_surface)
     pygame.display.update()
 ###################################  USER HAS DECIDED TO START THE GAME  #####################################
 def undo(constellations_planetName):
@@ -228,13 +245,13 @@ while True:
     for event in event_list:
         if event.type != pygame.MOUSEBUTTONDOWN: continue
         pos = event.pos
-        if EXIT_RECT.collidepoint(pos): exit()
-        elif SAVE_RECT.collidepoint(pos): saving = True
+        if EXIT_BUTTON.collidepoint(pos): exit()
+        elif SAVE_BUTTON.collidepoint(pos): saving = True
         elif user_be_drawing:
-            if END_CHARTING_RECT.collidepoint(pos): user_be_drawing = False
-            elif UNDO_RECT.collidepoint(pos): undo(constellations[planetName])
+            if END_CHARTING_BUTTON.collidepoint(pos): user_be_drawing = False
+            elif UNDO_BUTTON.collidepoint(pos): undo(constellations[planetName])
             elif exoPlanetSelector.pos_is_not_on_menu(pos): constellations[planetName][-1].append(pos)
-        elif START_CHARTING_RECT.collidepoint(pos):
+        elif START_CHARTING_BUTTON.collidepoint(pos):
             user_be_drawing = True
             constellations[planetName].append([])
 
@@ -248,16 +265,12 @@ while True:
                                                      planet['declination'], 
                                                      planet['rightascension']), dtype=np.float64)
         # Turns out, the shiftCartesianDatabase() function was creating a deepcopy every time anyways.
-        # and besides, we don't want to try to do that weird relativity thing if we ever do rotations.
+        # And besides, we really do not want to try to do that weird relativity thing if we ever do rotations.
         sky_surface = generateSkySurface(SIZE[0], SIZE[1], SIZE[1]-SIZE[0]/4, ShiftedCartesianDatabase(STAR_DATABASE, offset_vec))
-        
-
     #############################  Add main view before saving  ##########################
     window_surface.blit(BACKGROUND, (0, 0))
     window_surface.blit(sky_surface, (0, 0))
-    for chain in constellations[planetName]:
-        for i in range(len(chain)-1):
-            pygame.draw.line(window_surface, CONSTELLATION_COLOR, chain[i], chain[i+1], 3)
+    draw_constellations(constellations, planetName, window_surface)
     ##################  Save screen before reloading buttons if needed  ##################
     if saving: # In this case, we actually want the planet name up a bit higher
         exoPlanetSelector.draw_planetName_on(window_surface, y=TEXT_MARGIN)
@@ -268,22 +281,11 @@ while True:
     ##############  Reload title, buttons, dropdown menu, and constellations  #############
     window_surface.blit(TITLE_TEXT, TITLE_TEXT_POS)
     exoPlanetSelector.draw_dropdown_on(window_surface)
-    # EXIT BUTTON
-    pygame.draw.rect(window_surface, BUTTON_COLOR, EXIT_RECT, 0, BORDER_RADIUS)
-    window_surface.blit(EXIT_TEXT, EXIT_TEXT_POS)
-    # SAVE BUTTON
-    pygame.draw.rect(window_surface, BUTTON_COLOR, SAVE_RECT,  0, BORDER_RADIUS)
-    window_surface.blit(SAVE_TEXT, SAVE_TEXT_POS)
-
+    EXIT_BUTTON.draw_on(window_surface)
+    SAVE_BUTTON.draw_on(window_surface)
     if not user_be_drawing:
-        # START CHARTING BUTTON
-        pygame.draw.rect(window_surface, BUTTON_COLOR, START_CHARTING_RECT, 0, BORDER_RADIUS)
-        window_surface.blit(START_CHARTING_TEXT, START_CHARTING_TEXT_POS)
+        START_CHARTING_BUTTON.draw_on(window_surface)
     if user_be_drawing:
-        # END CHARTING BUTTON
-        pygame.draw.rect(window_surface, BUTTON_COLOR, END_CHARTING_RECT, 0, BORDER_RADIUS)
-        window_surface.blit(END_CHARTING_TEXT, END_CHARTING_TEXT_POS)
-        # UNDO BUTTON
-        pygame.draw.rect(window_surface, BUTTON_COLOR, UNDO_RECT, 0, BORDER_RADIUS)
-        window_surface.blit(UNDO_TEXT, UNDO_TEXT_POS)
-    pygame.display.update()
+        END_CHARTING_BUTTON.draw_on(window_surface)
+        UNDO_BUTTON.draw_on(window_surface)
+    pygame.display.update() # Start next frame
