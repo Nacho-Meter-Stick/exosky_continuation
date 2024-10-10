@@ -197,7 +197,7 @@ you end the last row and append a new empty row.
 Not only that, but every planet is going to have its own unique list of lists. 
 So really, constellations is a dict of these 2d lists.
 Yes, there are many planets, and this could become a memory problem. 
-But the amount of time you would have to spend waiting for the 'switch planet' function to work would be literally insane.
+But the total amount of time you would have to spend waiting for the 'switch planet' function to work would be literally insane.
 '''
 
 constellations: dict[str, list[list[tuple[int, int]]]] = {planetName: [[]]}
