@@ -107,10 +107,10 @@ TITLE_TEXT_HEIGHT = TITLE_TEXT.get_height()
 TITLE_TEXT_POS = (SIZE[0]/2-TITLE_TEXT_WIDTH/2, TEXT_MARGIN)
 ##################################################################################################
 class Button():
-    def __init__(self, TEXT, RECT_POS):
-        self.dims = (TEXT.get_width() + 2*TEXT_MARGIN, TEXT.get_width() + 2*TEXT_MARGIN)
-        self.rect = pygame.Rect(RECT_POS[0], RECT_POS[1], self.dims[0], self.dims[1])
+    def __init__(self, TEXT, RECT_POS, DIMENSIONS):
+        self.rect = pygame.Rect(RECT_POS[0], RECT_POS[1], DIMENSIONS[0], DIMENSIONS[1])
         self.rect_pos = RECT_POS
+        self.dims = DIMENSIONS
         self.text = TEXT
         self.text_pos = (RECT_POS[0] + TEXT_MARGIN, RECT_POS[1] + TEXT_MARGIN)
     def draw_on(self, surf):
@@ -124,55 +124,68 @@ START_DIMENSIONS = (START_TEXT.get_width() + 2*TEXT_MARGIN,
                     START_TEXT.get_height() + 2*TEXT_MARGIN)
 START_RECT_POS = (SIZE[0]/2 - START_DIMENSIONS[0]/2, 
                   SIZE[1] - START_DIMENSIONS[1] - BORDER_MARGIN)
-START_BUTTON = Button(START_TEXT, START_RECT_POS)
+START_BUTTON = Button(
+    START_TEXT,
+    START_RECT_POS,
+    START_DIMENSIONS
+)
 ##################################################################################################
 EXIT_TEXT = PLANET_FONT.render('Exit', False, '#2C2A4A')
 EXIT_DIMENSIONS = (EXIT_TEXT.get_width()+2*TEXT_MARGIN, 
                     EXIT_TEXT.get_height()+2*TEXT_MARGIN)
 EXIT_RECT_POS = (BORDER_MARGIN*3, 
                  SIZE[1] - EXIT_DIMENSIONS[1] - BORDER_MARGIN)
-EXIT_BUTTON = Button(EXIT_TEXT, EXIT_RECT_POS)
+EXIT_BUTTON = Button(
+    EXIT_TEXT,
+    EXIT_RECT_POS,
+    EXIT_DIMENSIONS
+)
 ##################################################################################################
 SAVE_TEXT = PLANET_FONT.render('Save', False, '#2C2A4A')
 SAVE_DIMENSIONS = (SAVE_TEXT.get_width()+2*TEXT_MARGIN, 
                     SAVE_TEXT.get_height()+2*TEXT_MARGIN)
 SAVE_RECT_POS = (SIZE[0] - SAVE_DIMENSIONS[0] - BORDER_MARGIN*3, 
                  SIZE[1] - SAVE_DIMENSIONS[1] - BORDER_MARGIN)
-SAVE_BUTTON = Button(SAVE_TEXT, SAVE_RECT_POS)
+SAVE_BUTTON = Button(
+    SAVE_TEXT,
+    SAVE_RECT_POS,
+    SAVE_DIMENSIONS
+)
 ##################################################################################################
 START_CHARTING_TEXT = PLANET_FONT.render('Start Charting', False, '#2C2A4A')
 START_CHARTING_DIMENSIONS = (START_CHARTING_TEXT.get_width()+2*TEXT_MARGIN, 
                              START_CHARTING_TEXT.get_height()+2*TEXT_MARGIN)
 START_CHARTING_RECT_POS = (BORDER_MARGIN*3, BORDER_MARGIN)
-START_CHARTING_BUTTON = Button(START_CHARTING_TEXT, START_CHARTING_RECT_POS)
+START_CHARTING_BUTTON = Button(
+    START_CHARTING_TEXT,
+    START_CHARTING_RECT_POS,
+    START_CHARTING_DIMENSIONS
+)
 ##################################################################################################
 END_CHARTING_TEXT = PLANET_FONT.render('End Charting', False, '#2C2A4A')
 END_CHARTING_DIMENSIONS = (END_CHARTING_TEXT.get_width()+2*TEXT_MARGIN, 
                              END_CHARTING_TEXT.get_height()+2*TEXT_MARGIN)
 END_CHARTING_RECT_POS = (BORDER_MARGIN*3, BORDER_MARGIN)
-END_CHARTING_BUTTON = Button(END_CHARTING_TEXT, END_CHARTING_RECT_POS)
+END_CHARTING_BUTTON = Button(
+    END_CHARTING_TEXT,
+    END_CHARTING_RECT_POS,
+    END_CHARTING_DIMENSIONS
+)
 ##################################################################################################
 UNDO_TEXT = PLANET_FONT.render('Undo', False, '#2C2A4A')
 UNDO_DIMENSIONS = (UNDO_TEXT.get_width()+2*TEXT_MARGIN, 
                     UNDO_TEXT.get_height()+2*TEXT_MARGIN)
 UNDO_RECT_POS = (BORDER_MARGIN*3, 
                  END_CHARTING_DIMENSIONS[1]+2*BORDER_MARGIN)
-UNDO_BUTTON = Button(UNDO_TEXT, UNDO_RECT_POS)
+UNDO_BUTTON = Button(
+    UNDO_TEXT,
+    UNDO_RECT_POS,
+    UNDO_DIMENSIONS
+)
 ##################################################################################################
 pygame.display.set_caption('Exosky!')
 user_be_drawing = False
 saving = False
-
-def undo(constellations, planetName):
-    if constellations[planetName]: 
-        if len(constellations[planetName][-1]) == 0: 
-            constellations[planetName].pop()
-        elif len(constellations[planetName]) > 1: 
-            constellations[planetName][-1].pop()
-def draw_constellations(constellations, planetName, surface):
-    for chain in constellations[planetName]:
-        for i in range(len(chain)-1):
-            pygame.draw.line(surface, CONSTELLATION_COLOR, chain[i], chain[i+1], 3)
 
 EXOPLANETSELECTOR_DIMENSIONS = (355, 60)
 exoPlanetSelector = SearchableDropDown(
@@ -197,10 +210,13 @@ you end the last row and append a new empty row.
 Not only that, but every planet is going to have its own unique list of lists. 
 So really, constellations is a dict of these 2d lists.
 Yes, there are many planets, and this could become a memory problem. 
-But the total amount of time you would have to spend waiting for the 'switch planet' function to work would be literally insane.
+But the amount of time you would have to spend waiting for the 'switch planet' function to work would be literally insane.
 '''
-
-constellations: dict[str, list[list[tuple[int, int]]]] = {planetName: [[]]}
+def draw_constellations(lines_bro, planet, surface):
+    for chain in constellations[planetName]:
+        for i in range(len(chain)-1):
+            pygame.draw.line(surface, CONSTELLATION_COLOR, chain[i], chain[i+1], 3)
+constellations = {planetName: [[]]}
 ################################### Loop on start screen #####################################
 while True:
     window_surface.blit(BACKGROUND, (0, 0))
@@ -216,6 +232,13 @@ while True:
     START_BUTTON.draw_on(window_surface)
     pygame.display.update()
 ###################################  USER HAS DECIDED TO START THE GAME  #####################################
+def undo(constellations_planetName):
+    if (constellations_planetName): 
+        if len(constellations_planetName[-1]) == 0: 
+            constellations_planetName.pop()
+            undo(constellations_planetName)
+        elif len(constellations_planetName) > 1: 
+            constellations_planetName[-1].pop()
 while True:
     ###################################  PROCESS EVENTS  #####################################
     event_list = pygame.event.get()
@@ -226,7 +249,7 @@ while True:
         elif SAVE_BUTTON.collidepoint(pos): saving = True
         elif user_be_drawing:
             if END_CHARTING_BUTTON.collidepoint(pos): user_be_drawing = False
-            elif UNDO_BUTTON.collidepoint(pos): undo(constellations, planetName)
+            elif UNDO_BUTTON.collidepoint(pos): undo(constellations[planetName])
             elif exoPlanetSelector.pos_is_not_on_menu(pos): constellations[planetName][-1].append(pos)
         elif START_CHARTING_BUTTON.collidepoint(pos):
             user_be_drawing = True
@@ -242,8 +265,7 @@ while True:
                                                      planet['declination'], 
                                                      planet['rightascension']), dtype=np.float64)
         # Turns out, the shiftCartesianDatabase() function was creating a deepcopy every time anyways.
-        # Besides that relativity stuff is difficult to think about. Makes the code more obscure and difficult to debug.
-        # It would would get even worse if we start doing rotations.
+        # And besides, we really do not want to try to do that weird relativity thing if we ever do rotations.
         sky_surface = generateSkySurface(SIZE[0], SIZE[1], SIZE[1]-SIZE[0]/4, ShiftedCartesianDatabase(STAR_DATABASE, offset_vec))
     #############################  Add main view before saving  ##########################
     window_surface.blit(BACKGROUND, (0, 0))
